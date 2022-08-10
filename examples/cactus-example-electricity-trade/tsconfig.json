@@ -6,9 +6,7 @@
     "tsBuildInfoFile": "../../.build-cache/cactus-example-electricity-trade.tsbuildinfo",
     "strict": false // TODO - true, fix warnings
   },
-  "include": [
-    "./*.ts",
-  ],
+  "include": ["./*.ts"],
   "references": [
     {
       "path": "../../packages/cactus-cmd-socketio-server/tsconfig.json"

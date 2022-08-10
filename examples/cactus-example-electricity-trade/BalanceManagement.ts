@@ -20,8 +20,13 @@ const moduleName = "BalanceManagement";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
+export interface BalanceResponse {
+  status: string | number;
+  amount: number;
+}
+
 export class BalanceManagement {
-  private connectInfo: LPInfoHolder = null; // connection information
+  private connectInfo: LPInfoHolder | null = null; // connection information
   private readonly verifierFactory: VerifierFactory;
 
   constructor() {
@@ -41,7 +46,7 @@ export class BalanceManagement {
       // for Neo
       const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
       const method = { type: "web3Eth", command: "getBalance" };
-      const template = "default";
+      // const template = "default";
       const args = { args: [account] };
       // const method = "default";
       // const args = {"method": {type: "web3Eth", command: "getBalance"}, "args": {"args": [account]}};

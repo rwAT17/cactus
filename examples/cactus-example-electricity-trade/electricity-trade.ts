@@ -20,8 +20,7 @@ const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 const router: Router = Router();
-export const transactionManagement: TransactionManagement =
-  new TransactionManagement();
+export const transactionManagement: TransactionManagement = new TransactionManagement();
 
 // Request Execution of Trade
 router.post("/", (req: Request, res: Response, next: NextFunction) => {
@@ -68,7 +67,7 @@ router.post(
 
       next(err);
     }
-  }
+  },
 );
 
 export default router;
