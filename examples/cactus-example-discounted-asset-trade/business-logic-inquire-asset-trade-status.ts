@@ -36,7 +36,7 @@ export class BusinessLogicInquireAssetTradeStatus extends BusinessLogicBase {
       new ResultTransactionStatusData();
     for (const transactionInfoJson of transactionInfoTable) {
       const transactionInfo: TransactionInfo = JSON.parse(
-        transactionInfoJson
+        transactionInfoJson,
       ) as TransactionInfo;
 
       // Determine if target record
@@ -50,10 +50,10 @@ export class BusinessLogicInquireAssetTradeStatus extends BusinessLogicBase {
         escrowTransactionStatus.ledger = transactionInfo.escrowLedger;
         escrowTransactionStatus.txID = transactionInfo.escrowTxID;
         escrowTransactionStatus.txInfo = JSON.parse(
-          transactionInfo.escrowTxInfo
+          transactionInfo.escrowTxInfo,
         );
         resultTransactionStatusData.transactionStatus.push(
-          escrowTransactionStatus
+          escrowTransactionStatus,
         );
 
         const transferTransactionStatus = new TransactionStatus();
@@ -61,10 +61,10 @@ export class BusinessLogicInquireAssetTradeStatus extends BusinessLogicBase {
         transferTransactionStatus.ledger = transactionInfo.transferLedger;
         transferTransactionStatus.txID = transactionInfo.transferTxID;
         transferTransactionStatus.txInfo = JSON.parse(
-          transactionInfo.transferTxInfo
+          transactionInfo.transferTxInfo,
         );
         resultTransactionStatusData.transactionStatus.push(
-          transferTransactionStatus
+          transferTransactionStatus,
         );
 
         const settlementTransactionStatus = new TransactionStatus();
@@ -72,10 +72,10 @@ export class BusinessLogicInquireAssetTradeStatus extends BusinessLogicBase {
         settlementTransactionStatus.ledger = transactionInfo.settlementLedger;
         settlementTransactionStatus.txID = transactionInfo.settlementTxID;
         settlementTransactionStatus.txInfo = JSON.parse(
-          transactionInfo.settlementTxInfo
+          transactionInfo.settlementTxInfo,
         );
         resultTransactionStatusData.transactionStatus.push(
-          settlementTransactionStatus
+          settlementTransactionStatus,
         );
 
         break;
