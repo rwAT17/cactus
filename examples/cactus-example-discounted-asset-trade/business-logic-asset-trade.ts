@@ -71,7 +71,19 @@ interface EthData {
   [key: string]: unknown;
 }
 
-interface FabricEvent {}
+interface InputObject {
+  proof_request: string;
+  proof: string;
+}
+
+interface Identifiers {
+  referent: string;
+  schemaId: string;
+  item: string;
+  [keyof: string]: string;
+}
+
+// interface FabricEvent {}
 
 export class BusinessLogicAssetTrade extends BusinessLogicBase {
   transactionInfoManagement: TransactionInfoManagement;
@@ -205,7 +217,13 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     return requestInfo;
   }
 
-  async isPreferredCustomer(input_obj: unknown): Promise<boolean | unknown> {
+  async isPreferredCustomer(input_obj: {
+    tradeInfo: {
+      proofJson: string;
+    };
+    proof_request: string;
+    proof: string;
+  }): Promise<boolean | unknown> {
     let proofRequestJson;
     let proofJson;
     try {
@@ -270,19 +288,28 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     }
   }
 
-  async verifierGetEntitiesFromLedger(did, identifiers: []) {
-    const schemas = {};
-    const credDefs = {};
+  async verifierGetEntitiesFromLedger(
+    did: string | null,
+    identifiers: ,
+  ): Promise<
+    [
+      Record<string, unknown>,
+      Record<string, unknown>,
+      Record<string, unknown>,
+      Record<string, unknown>,
+    ]
+  > {
+    const schemas: { [keyof: string]: string } = {};
+    const credDefs: { [keyof: string]: string } = {};
     const revRegDefs = {};
     const revRegs = {};
 
     for (const referent of Object.keys(identifiers)) {
       const item = identifiers[referent];
       const args_request_getSchema = { did: did, schemaId: item["schema_id"] };
-      const responseSchema = await getDataFromIndy(
-        args_request_getSchema,
-        identifierSchema,
-      );
+      const responseSchema: {
+        data: string[];
+      } = await getDataFromIndy(args_request_getSchema, identifierSchema);
       const [receivedSchemaId, receivedSchema] = responseSchema["data"];
       schemas[receivedSchemaId] = JSON.parse(receivedSchema);
 
@@ -290,10 +317,9 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         did: did,
         schemaId: item["cred_def_id"],
       };
-      const responseCredDef = await getDataFromIndy(
-        args_request_getCredDef,
-        identifierCredDef,
-      );
+      const responseCredDef: {
+        data: string[];
+      } = await getDataFromIndy(args_request_getCredDef, identifierCredDef);
       const [receivedCredDefId, receivedCredDef] = responseCredDef["data"];
       credDefs[receivedCredDefId] = JSON.parse(receivedCredDef);
 
@@ -632,7 +658,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
   getTransactionFromEthereumEvent(
     event: EthEvent,
     targetIndex: number,
-  ): EthData | null {
+  ): EthData | undefined {
     try {
       const retTransaction = event["blockData"]["transactions"][targetIndex];
       logger.debug(
@@ -694,9 +720,8 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     let transactionInfo: TransactionInfo = null;
     try {
       // Retrieve DB transaction information
-      transactionInfo = this.transactionInfoManagement.getTransactionInfoByTxId(
-        txId,
-      );
+      transactionInfo =
+        this.transactionInfoManagement.getTransactionInfoByTxId(txId);
       if (transactionInfo != null) {
         logger.debug(
           `##onEvent(A), transactionInfo: ${json2str(transactionInfo)}`,
@@ -825,7 +850,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     return null;
   }
 
-  getTxIDFromEventEtherem(event: object, targetIndex: number): string | null {
+  getTxIDFromEventEtherem(event: EthEvent, targetIndex: number): string | null {
     logger.debug(`##in getTxIDFromEventEtherem()`);
     const tx = this.getTransactionFromEthereumEvent(event, targetIndex);
     if (tx == null) {

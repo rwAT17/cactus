@@ -34,11 +34,10 @@ const verifierFactory = new VerifierFactory(
   config.logLevel,
 );
 
-
 export function getDataFromIndy(
   arg_request: {},
-  identifier: string
-): Promise<{}> {
+  identifier: string,
+): Promise<{ data: string[]; [keyof: string]: number }> {
   return new Promise(async (resolve, reject) => {
     try {
       logger.debug(`getDataFromIndy: arg_request: ${arg_request}`);

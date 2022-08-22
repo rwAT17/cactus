@@ -6,7 +6,7 @@
  */
 
 // transaction information
-class TradeInfo {
+export class TradeInfo {
   ethereumAccountFrom: string = "";
   ethereumAccountTo: string = "";
   fabricAccountFrom: string = "";
