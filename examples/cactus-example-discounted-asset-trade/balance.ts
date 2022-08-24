@@ -10,8 +10,8 @@ import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
 import { RIFError } from "@hyperledger/cactus-cmd-socket-server";
 import { BalanceManagement } from "./balance-management";
 
-const fs = require("fs");
-const path = require("path");
+// const fs = require("fs");
+// const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "balance";
@@ -35,7 +35,9 @@ router.get("/:account", (req: Request, res: Response, next: NextFunction) => {
         logger.error(err);
       });
   } catch (err) {
-    logger.error(`##err name: ${err.constructor.name}`);
+    if (err instanceof Error) {
+      logger.error(`##err name: ${err.constructor.name}`);
+    }
 
     if (err instanceof RIFError) {
       logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);

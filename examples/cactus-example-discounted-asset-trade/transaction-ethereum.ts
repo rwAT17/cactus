@@ -57,7 +57,7 @@ export function makeRawTransaction(txParam: {
 
         const rawTx: { nonce: string; to: string; value: number; gas: number } =
           {
-            nonce: txnCountHex,
+          nonce: txnCountHex,
             to: txParam.toAddress,
             value: txParam.amount,
             gas: txParam.gas,

@@ -71,17 +71,17 @@ interface EthData {
   [key: string]: unknown;
 }
 
-interface InputObject {
-  proof_request: string;
-  proof: string;
-}
+// interface InputObject {
+//   proof_request: string;
+//   proof: string;
+// }
 
-interface Identifiers {
-  referent: string;
-  schemaId: string;
-  item: string;
-  [keyof: string]: string;
-}
+// interface Identifiers {
+//   referent: string;
+//   schemaId: string;
+//   item: string;
+//   [keyof: string]: string;
+// }
 
 // interface FabricEvent {}
 
@@ -217,13 +217,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     return requestInfo;
   }
 
-  async isPreferredCustomer(input_obj: {
-    tradeInfo: {
-      proofJson: string;
-    };
-    proof_request: string;
-    proof: string;
-  }): Promise<boolean | unknown> {
+  async isPreferredCustomer(input_obj: any): Promise<boolean | unknown> {
     let proofRequestJson;
     let proofJson;
     try {
@@ -239,8 +233,15 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     // get schema & credential definition from indy
     // now verifierGetEntitiesFromLedger don't get revRegDefs & revRegs
     // did is null. If it is null, indy.buidlGetSchemaRequest API get data by default param.
-    const [schemasJson, credDefsJson, revRegDefsJson, revRegsJson] =
-      await this.verifierGetEntitiesFromLedger(null, proofJson["identifiers"]);
+    const [
+      schemasJson,
+      credDefsJson,
+      revRegDefsJson,
+      revRegsJson,
+    ] = await this.verifierGetEntitiesFromLedger(
+      null,
+      proofJson["identifiers"],
+    );
 
     assert(
       "Permanent" ===
@@ -290,7 +291,9 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
 
   async verifierGetEntitiesFromLedger(
     did: string | null,
-    identifiers: ,
+    identifiers: {
+      [keyof: string]: { schema_id: string; cred_def_id: string };
+    },
   ): Promise<
     [
       Record<string, unknown>,
@@ -323,9 +326,9 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       const [receivedCredDefId, receivedCredDef] = responseCredDef["data"];
       credDefs[receivedCredDefId] = JSON.parse(receivedCredDef);
 
-      if (item.rev_reg_seq_no) {
-        // TODO Get Revocation Definitions and Revocation Registries
-      }
+      // if (item.rev_reg_seq_no) {
+      //   // TODO Get Revocation Definitions and Revocation Registries
+      // }
     }
 
     logger.debug("finish get Data from indy");
@@ -720,8 +723,9 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     let transactionInfo: TransactionInfo = null;
     try {
       // Retrieve DB transaction information
-      transactionInfo =
-        this.transactionInfoManagement.getTransactionInfoByTxId(txId);
+      transactionInfo = this.transactionInfoManagement.getTransactionInfoByTxId(
+        txId,
+      );
       if (transactionInfo != null) {
         logger.debug(
           `##onEvent(A), transactionInfo: ${json2str(transactionInfo)}`,
@@ -731,8 +735,9 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         return;
       }
       const txStatus = transactionInfo.status;
-      const tradeInfo =
-        this.createTradeInfoFromTransactionInfo(transactionInfo);
+      const tradeInfo = this.createTradeInfoFromTransactionInfo(
+        transactionInfo,
+      );
       let txInfoData: TxInfoData;
       switch (txStatus) {
         case AssetTradeStatus.UnderEscrow:
@@ -820,12 +825,10 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
 
   getOperationStatus(tradeID: string): object {
     logger.debug(`##in getOperationStatus()`);
-    const businessLogicInquireAssetTradeStatus: BusinessLogicInquireAssetTradeStatus =
-      new BusinessLogicInquireAssetTradeStatus();
-    const transactionStatusData =
-      businessLogicInquireAssetTradeStatus.getAssetTradeOperationStatus(
-        tradeID,
-      );
+    const businessLogicInquireAssetTradeStatus: BusinessLogicInquireAssetTradeStatus = new BusinessLogicInquireAssetTradeStatus();
+    const transactionStatusData = businessLogicInquireAssetTradeStatus.getAssetTradeOperationStatus(
+      tradeID,
+    );
 
     return transactionStatusData;
   }
@@ -912,8 +915,9 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
 
   hasTxIDInTransactions(txID: string): boolean {
     logger.debug(`##in hasTxIDInTransactions(), txID: ${txID}`);
-    const transactionInfo =
-      this.transactionInfoManagement.getTransactionInfoByTxId(txID);
+    const transactionInfo = this.transactionInfoManagement.getTransactionInfoByTxId(
+      txID,
+    );
     logger.debug(`##hasTxIDInTransactions(), ret: ${transactionInfo !== null}`);
     return transactionInfo !== null;
   }
