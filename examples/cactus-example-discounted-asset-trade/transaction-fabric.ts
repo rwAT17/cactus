@@ -34,7 +34,15 @@ export function makeSignedProposal<T>(
   ccFncName: string,
   ccArgs: string[],
   verifierFabric: Verifier<T>,
-): Promise<{ data: {}; txId: string }> {
+): Promise<{
+  data: {
+    signedCommitProposal: {
+      signature: string | Buffer;
+      proposal_bytes: string | Buffer;
+    };
+  };
+  txId: string;
+}> {
   // exports.Invoke = async function(reqBody, isWait){
   // let eventhubs = []; // For the time being, give up the eventhub connection of multiple peers.
   let invokeResponse; // Return value from chain code
@@ -57,7 +65,9 @@ export function makeSignedProposal<T>(
       let certPem = undefined;
       let privateKeyPem = undefined;
       const submitter = config.assetTradeInfo.fabric.submitter.name;
-      const wallet = new FileSystemWallet(config.assetTradeInfo.fabric.keystore);
+      const wallet = new FileSystemWallet(
+        config.assetTradeInfo.fabric.keystore,
+      );
       logger.debug(`Wallet path: ${config.assetTradeInfo.fabric.keystore}`);
 
       const submitterExists = await wallet.exists(submitter);
@@ -68,7 +78,9 @@ export function makeSignedProposal<T>(
       }
 
       // const signedTx = await TransactionSigner.signTxFabric(transactionProposalReq, certPem, privateKeyPem);
-      const contract = { channelName: config.assetTradeInfo.fabric.channelName };
+      const contract = {
+        channelName: config.assetTradeInfo.fabric.channelName,
+      };
       const method = { type: "function", command: "sendSignedProposal" };
       const template = "default";
       const argsParam: {} = {

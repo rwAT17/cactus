@@ -71,19 +71,13 @@ interface EthData {
   [key: string]: unknown;
 }
 
-// interface InputObject {
-//   proof_request: string;
-//   proof: string;
-// }
-
-// interface Identifiers {
-//   referent: string;
-//   schemaId: string;
-//   item: string;
-//   [keyof: string]: string;
-// }
-
-// interface FabricEvent {}
+interface FabricEvent {
+  txId: string;
+  blockData: [];
+  hash: string;
+  status: number;
+  [transactions: number]: string;
+}
 
 export class BusinessLogicAssetTrade extends BusinessLogicBase {
   transactionInfoManagement: TransactionInfoManagement;
@@ -217,7 +211,10 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     return requestInfo;
   }
 
-  async isPreferredCustomer(input_obj: any): Promise<boolean | unknown> {
+  async isPreferredCustomer(input_obj: {
+    proof_request: string;
+    proof: string;
+  }): Promise<boolean | unknown> {
     let proofRequestJson;
     let proofJson;
     try {
@@ -675,9 +672,13 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     }
   }
 
-  onEvenFabric(event: object, targetIndex: number): void {
+  onEvenFabric(event: FabricEvent, targetIndex: number): void {
     logger.debug(`##in onEvenFabric()`);
-    const tx = this.getTransactionFromFabricEvent(event, targetIndex);
+    const tx:
+      | {
+          txId: string;
+        }
+      | undefined = this.getTransactionFromFabricEvent(event, targetIndex);
     if (tx == null) {
       logger.warn(`##onEvenFabric(): invalid event: ${json2str(event)}`);
       return;
@@ -705,7 +706,10 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     }
   }
 
-  getTransactionFromFabricEvent(event: object, targetIndex): object | null {
+  getTransactionFromFabricEvent(
+    event: FabricEvent,
+    targetIndex: number,
+  ): FabricEvent | undefined {
     try {
       const retTransaction = event["blockData"][targetIndex];
       logger.debug(
@@ -719,8 +723,8 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     }
   }
 
-  executeNextTransaction(txInfo: object, txId: string): void {
-    let transactionInfo: TransactionInfo = null;
+  executeNextTransaction(txInfo: Record<string, unknown>, txId: string): void {
+    let transactionInfo: TransactionInfo | null = null;
     try {
       // Retrieve DB transaction information
       transactionInfo = this.transactionInfoManagement.getTransactionInfoByTxId(
@@ -739,10 +743,11 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         transactionInfo,
       );
       let txInfoData: TxInfoData;
+
       switch (txStatus) {
         case AssetTradeStatus.UnderEscrow:
           // store transaction information in DB
-          txInfoData = new TxInfoData("escrow", json2str(txInfo));
+          txInfoData = new TxInfoData("escrow", JSON.stringify(txInfo));
           this.transactionInfoManagement.setTxInfo(tradeInfo, txInfoData);
 
           // underEscrow -> underTransfer
@@ -762,7 +767,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
           break;
         case AssetTradeStatus.UnderTransfer:
           // store transaction information in DB
-          txInfoData = new TxInfoData("transfer", json2str(txInfo));
+          txInfoData = new TxInfoData("transfer", JSON.stringify(txInfo));
           this.transactionInfoManagement.setTxInfo(tradeInfo, txInfoData);
 
           // underTransfer -> underSettlement
@@ -782,7 +787,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
           break;
         case AssetTradeStatus.UnderSettlement:
           // store transaction information in DB
-          txInfoData = new TxInfoData("settlement", json2str(txInfo));
+          txInfoData = new TxInfoData("settlement", JSON.stringify(txInfo));
           this.transactionInfoManagement.setTxInfo(tradeInfo, txInfoData);
 
           // underSettlement -> completed
@@ -807,7 +812,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       }
     } catch (err) {
       logger.error(
-        `##ERR: executeNextTransaction(), err: ${err}, tx: ${json2str(
+        `##ERR: executeNextTransaction(), err: ${err}, tx: ${JSON.stringify(
           transactionInfo,
         )}`,
       );
@@ -823,7 +828,17 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     }
   }
 
-  getOperationStatus(tradeID: string): object {
+  getOperationStatus(
+    tradeID: string,
+  ): {
+    stateInfo: number;
+    transactionStatus: {
+      state: string;
+      ledger: string;
+      txID: string;
+      txInfo: string; // JSON string
+    }[];
+  } {
     logger.debug(`##in getOperationStatus()`);
     const businessLogicInquireAssetTradeStatus: BusinessLogicInquireAssetTradeStatus = new BusinessLogicInquireAssetTradeStatus();
     const transactionStatusData = businessLogicInquireAssetTradeStatus.getAssetTradeOperationStatus(
@@ -883,7 +898,10 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     }
   }
 
-  getTxIDFromEventFabric(event: object, targetIndex: number): string | null {
+  getTxIDFromEventFabric(
+    event: FabricEvent,
+    targetIndex: number,
+  ): string | null {
     logger.debug(`##in getTxIDFromEventFabric()`);
     const tx = this.getTransactionFromFabricEvent(event, targetIndex);
     if (tx == null) {
