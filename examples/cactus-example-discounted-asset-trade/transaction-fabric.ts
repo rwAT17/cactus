@@ -18,9 +18,9 @@
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
 import { Verifier } from "@hyperledger/cactus-verifier-client";
 
-const fs = require("fs");
-const path = require("path");
-const yaml = require("js-yaml");
+// const fs = require("fs");
+// const path = require("path");
+// const yaml = require("js-yaml");
 import { FileSystemWallet } from "fabric-network";
 
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
@@ -45,8 +45,8 @@ export function makeSignedProposal<T>(
 }> {
   // exports.Invoke = async function(reqBody, isWait){
   // let eventhubs = []; // For the time being, give up the eventhub connection of multiple peers.
-  let invokeResponse; // Return value from chain code
-  let channel;
+  // let invokeResponse; // Return value from chain code
+  // let channel;
 
   return new Promise(async (resolve, reject) => {
     try {
@@ -82,8 +82,14 @@ export function makeSignedProposal<T>(
         channelName: config.assetTradeInfo.fabric.channelName,
       };
       const method = { type: "function", command: "sendSignedProposal" };
-      const template = "default";
-      const argsParam: {} = {
+      // const template = "default";
+      const argsParam: {
+        args: {
+          transactionProposalReq: Record<string, unknown>;
+          certPem: undefined;
+          privateKeyPem: undefined;
+        };
+      } = {
         args: {
           transactionProposalReq: transactionProposalReq,
           certPem: certPem,

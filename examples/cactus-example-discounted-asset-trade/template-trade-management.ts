@@ -13,8 +13,8 @@ import {
   VerifierFactoryConfig,
 } from "@hyperledger/cactus-verifier-client";
 
-const fs = require("fs");
-const path = require("path");
+// const fs = require("fs");
+// const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "TemplateTradeManagement";
@@ -22,7 +22,7 @@ const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 export class TemplateTradeManagement {
-  private connectInfo: LPInfoHolder = null; // connection information
+  private connectInfo: LPInfoHolder | null = null; // connection information
   private readonly verifierFactory: VerifierFactory;
 
   constructor() {
@@ -41,8 +41,8 @@ export class TemplateTradeManagement {
       const args = req.body.args;
       logger.debug(
         `##contract: ${contract}, method: ${JSON.stringify(
-          method
-        )}, template: ${template}, args: ${JSON.stringify(args)}`
+          method,
+        )}, template: ${template}, args: ${JSON.stringify(args)}`,
       );
 
       // ex.
@@ -54,10 +54,10 @@ export class TemplateTradeManagement {
         .getVerifier("84jUisrs")
         .sendSyncRequest(contract, method, args)
         .then((result) => {
-          const response = {
-            status: result.status,
-            result: JSON.stringify(result.data),
-          };
+          // const response = {
+          //   status: result.status,
+          //   result: JSON.stringify(result.data),
+          // };
           // resolve(response);
           resolve(result);
         })
@@ -74,12 +74,12 @@ export class TemplateTradeManagement {
 
     const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
     const method = {};
-    const template = req.body.template;
+    // const template = req.body.template;
     const args = req.body.args;
     logger.debug(
       `##contract: ${contract}, method: ${method}, args: ${JSON.stringify(
-        args
-      )}`
+        args,
+      )}`,
     );
 
     // ex.

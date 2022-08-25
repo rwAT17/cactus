@@ -158,7 +158,7 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
 
 function getLatestNonce(fromAddress: string): number {
   if (mapFromAddressNonce.has(fromAddress)) {
-    return mapFromAddressNonce.get(fromAddress);
+    return mapFromAddressNonce.get(fromAddress); //?
   }
   //return 0;
   return -1;

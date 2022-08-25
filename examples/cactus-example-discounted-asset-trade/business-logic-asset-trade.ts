@@ -60,6 +60,17 @@ const identifierCredDef = "credDef";
 //   revRegDefs: Record<string, unknown>;
 //   revRegs: Record<string, unknown>;
 // }
+
+// interface RequestTradeInfo {
+//   ethereumAccountFrom: string;
+//   ethereumAccountTo: string;
+//   fabricAccountFrom: string;
+//   fabricAccountTo: string;
+//   tradingValue: string;
+//   assetID: string;
+//   proofJson: object;
+// }
+
 interface EthEvent {
   blockData: { transactions: { [key: string]: EthData } };
   hash: string;
@@ -212,6 +223,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
   }
 
   async isPreferredCustomer(input_obj: {
+    tradeInfo: string;
     proof_request: string;
     proof: string;
   }): Promise<boolean | unknown> {
