@@ -16,13 +16,13 @@ import {
   VerifierFactoryConfig,
 } from "@hyperledger/cactus-verifier-client";
 
-const ethJsCommon = require("ethereumjs-common").default;
-const ethJsTx = require("ethereumjs-tx").Transaction;
-const libWeb3 = require("web3");
+// const ethJsCommon = require("ethereumjs-common").default;
+// const ethJsTx = require("ethereumjs-tx").Transaction;
+// const libWeb3 = require("web3");
 
-const fs = require("fs");
-const path = require("path");
-const yaml = require("js-yaml");
+// const fs = require("fs");
+// const path = require("path");
+// const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
@@ -43,34 +43,44 @@ export function makeRawTransaction(txParam: {
   toAddress: string;
   amount: number;
   gas: number;
-}): Promise<{ data: {}; txId: string }> {
+}): Promise<{
+  data: { serializedTx: string; [k: string]: string };
+  txId: string;
+}> {
   return new Promise(async (resolve, reject) => {
     try {
       logger.debug(`makeRawTransaction: txParam: ${JSON.stringify(txParam)}`);
 
       getNewNonce(txParam.fromAddress).then((result) => {
         logger.debug(
-          `##makeRawTransaction(A): result: ${JSON.stringify(result)}`
+          `##makeRawTransaction(A): result: ${JSON.stringify(result)}`,
         );
 
         const txnCountHex: string = result.txnCountHex;
 
-        const rawTx: { nonce: string; to: string; value: number; gas: number } =
-          {
+        const rawTx: {
+          nonce: string;
+          to: string;
+          value: number;
+          gas: number;
+        } = {
           nonce: txnCountHex,
-            to: txParam.toAddress,
-            value: txParam.amount,
-            gas: txParam.gas,
-          };
+          to: txParam.toAddress,
+          value: txParam.amount,
+          gas: txParam.gas,
+        };
         logger.debug(
-          `##makeRawTransaction(B), rawTx: ${JSON.stringify(rawTx)}`
+          `##makeRawTransaction(B), rawTx: ${JSON.stringify(rawTx)}`,
         );
 
-        const signedTx = TransactionSigner.signTxEthereum(
-          rawTx,
-          txParam.fromAddressPkey
-        );
-        const resp: { data: {}; txId: string } = {
+        const signedTx: {
+          serializedTx: string;
+          txId: string;
+        } = TransactionSigner.signTxEthereum(rawTx, txParam.fromAddressPkey);
+        const resp: {
+          data: { serializedTx: string };
+          txId: string;
+        } = {
           data: { serializedTx: signedTx["serializedTx"] },
           txId: signedTx["txId"],
         };
@@ -112,7 +122,7 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
             // nonce correction
             txnCount = latestNonce + 1;
             logger.debug(
-              `##getNewNonce(C): Adjust txnCount, fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`
+              `##getNewNonce(C): Adjust txnCount, fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`,
             );
 
             const method = { type: "function", command: "toHex" };
