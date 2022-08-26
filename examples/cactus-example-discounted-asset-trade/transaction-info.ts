@@ -31,9 +31,11 @@ export class TransactionInfo {
   settlementTxID: string;
   settlementTxInfo: string;
 
-  constructor() {}
+  constructor() {
+    // Do nothing
+  }
 
-  setRequestInfo(mode: number, requestInfo: RequestInfo) {
+  setRequestInfo(mode: number, requestInfo: RequestInfo): void {
     // Set request information
     this.businessLogicID = requestInfo.businessLogicID;
     this.tradeID = requestInfo.tradeID;

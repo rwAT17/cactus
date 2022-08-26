@@ -19,7 +19,7 @@ const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 export class FabricAssetManagement {
-  private connectInfo: LPInfoHolder = null; // connection information
+  private connectInfo: LPInfoHolder | null = null; // connection information
   private readonly verifierFactory: VerifierFactory;
 
   constructor() {
@@ -30,7 +30,7 @@ export class FabricAssetManagement {
     );
   }
 
-  queryAsset(assetID: string): Promise<any> {
+  queryAsset(assetID: string): Promise<unknown> {
     return new Promise((resolve, reject) => {
       const contract = { channelName: "mychannel", contractName: "basic" };
       const method = { type: "evaluateTransaction", command: "ReadAsset" };
@@ -51,7 +51,7 @@ export class FabricAssetManagement {
     });
   }
 
-  queryAllAssets(): Promise<any> {
+  queryAllAssets(): Promise<unknown> {
     return new Promise((resolve, reject) => {
       const contract = { channelName: "mychannel", contractName: "basic" };
       const method = { type: "evaluateTransaction", command: "GetAllAssets" };

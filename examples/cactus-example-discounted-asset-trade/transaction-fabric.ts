@@ -30,6 +30,16 @@ const moduleName = "TransactionFabric";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
+interface sendSyncRequestResult {
+  data: {
+    signedCommitProposal: {
+      signature: string | Buffer;
+      proposal_bytes: string | Buffer;
+    };
+  };
+  txId: string;
+}
+
 export function makeSignedProposal<T>(
   ccFncName: string,
   ccArgs: string[],
@@ -103,13 +113,13 @@ export function makeSignedProposal<T>(
           // logger.debug(`##makeSignedProposal: resp.data: ${JSON.stringify(resp.data)}`);
           logger.debug(`Successfully build endorse and commit`);
 
-          const args: {} = {
+          const args = {
             // signedCommitProposal: resp["signedCommitProposal"],
             signedCommitProposal: resp.data["signedCommitProposal"],
             // commitReq: resp["commitReq"]
             commitReq: resp.data["commitReq"],
           };
-          const result: { data: {}; txId: string } = {
+          const result: sendSyncRequestResult = {
             data: args,
             // txId: resp["txId"]
             txId: resp.data["txId"],

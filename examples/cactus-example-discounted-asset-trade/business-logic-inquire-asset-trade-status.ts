@@ -20,7 +20,7 @@ export class BusinessLogicInquireAssetTradeStatus extends BusinessLogicBase {
 
   getAssetTradeOperationStatus(
     tradeID: string,
-  ): { stateInfo: number; transactionStatus: TransactionStatus[] } {
+  ): { stateInfo: number | undefined; transactionStatus: TransactionStatus[] } {
     // Existence check of table file
     try {
       fs.statSync(this.fileName);

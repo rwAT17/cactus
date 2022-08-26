@@ -79,7 +79,6 @@ interface EthEvent {
 }
 interface EthData {
   hash: string;
-  [key: string]: unknown;
 }
 
 interface FabricEvent {
@@ -87,7 +86,6 @@ interface FabricEvent {
   blockData: [];
   hash: string;
   status: number;
-  [transactions: number]: string;
 }
 
 export class BusinessLogicAssetTrade extends BusinessLogicBase {
@@ -329,9 +327,11 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         did: did,
         schemaId: item["cred_def_id"],
       };
+
       const responseCredDef: {
         data: string[];
       } = await getDataFromIndy(args_request_getCredDef, identifierCredDef);
+
       const [receivedCredDefId, receivedCredDef] = responseCredDef["data"];
       credDefs[receivedCredDefId] = JSON.parse(receivedCredDef);
 
@@ -519,7 +519,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     ethereumAccountTo: string,
     tradingValue: string,
     tradeInfo: TradeInfo,
-  ) {
+  ): void {
     logger.debug("called thirdTransaction");
 
     // Get Verifier Instance
@@ -735,7 +735,10 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     }
   }
 
-  executeNextTransaction(txInfo: Record<string, unknown>, txId: string): void {
+  executeNextTransaction(
+    txInfo: Record<string, unknown> | EthData,
+    txId: string,
+  ): void {
     let transactionInfo: TransactionInfo | null = null;
     try {
       // Retrieve DB transaction information

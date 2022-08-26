@@ -12,8 +12,8 @@ import { TradeInfo, ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
 import { AssetTradeStatus } from "./define";
 
 const fs = require("fs");
-const path = require("path");
-const yaml = require("js-yaml");
+// const path = require("path");
+// const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
@@ -21,21 +21,27 @@ const moduleName = "TransactionInfoManagement";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
+interface TransactionInfoTable {
+  table: string[];
+}
+
 // Transaction Information Management Class
 export class TransactionInfoManagement {
   fileName = "transaction-Info.json";
 
-  constructor() {}
+  constructor() {
+    // Do nothing
+  }
 
   // For debugging
-  fileDump() {
+  fileDump(): void {
     const confirmData: string = fs.readFileSync(this.fileName, "utf8");
     const arrayData: TransactionInfo[] = JSON.parse(confirmData)
       .table as TransactionInfo[];
-    // logger.debug(arrayData);
+    logger.debug(arrayData);
   }
 
-  addTransactionInfo(transactionInfo: TransactionInfo) {
+  addTransactionInfo(transactionInfo: TransactionInfo): void {
     // Existence check of table file
     try {
       fs.statSync(this.fileName);
@@ -50,23 +56,24 @@ export class TransactionInfoManagement {
 
     const transactionInfoJson: string = JSON.stringify(transactionInfo);
 
-    let transactionInfoTable = {
+    let transactionInfoTable: TransactionInfoTable = {
       table: [],
     };
     const transactionInfoFileData: string = fs.readFileSync(
       this.fileName,
-      "utf8"
+      "utf8",
     );
     transactionInfoTable = JSON.parse(transactionInfoFileData);
     transactionInfoTable.table.push(transactionInfoJson);
-    const transactionInfoTableJson: string =
-      JSON.stringify(transactionInfoTable);
+    const transactionInfoTableJson: string = JSON.stringify(
+      transactionInfoTable,
+    );
     fs.writeFileSync(this.fileName, transactionInfoTableJson, "utf8");
 
     this.fileDump();
   }
 
-  setStatus(tradeInfo: TradeInfo, status: AssetTradeStatus) {
+  setStatus(tradeInfo: TradeInfo, status: AssetTradeStatus): void {
     // Existence check of table file
     try {
       fs.statSync(this.fileName);
@@ -80,12 +87,12 @@ export class TransactionInfoManagement {
       .table as string[];
 
     // Search target records / replace data
-    const transactionInfoTableNew = {
+    const transactionInfoTableNew: TransactionInfoTable = {
       table: [],
     };
-    transactionInfoTable.forEach((transactionInfoJSON, index) => {
+    transactionInfoTable.forEach((transactionInfoJSON) => {
       const transactionInfo: TransactionInfo = JSON.parse(
-        transactionInfoJSON
+        transactionInfoJSON,
       ) as TransactionInfo;
 
       // Determine if it is a target record
@@ -104,14 +111,17 @@ export class TransactionInfoManagement {
 
     // Table File Write
     const transactionInfoTableNewJson: string = JSON.stringify(
-      transactionInfoTableNew
+      transactionInfoTableNew,
     );
     fs.writeFileSync(this.fileName, transactionInfoTableNewJson, "utf8");
 
     this.fileDump();
   }
 
-  setTransactionData(tradeInfo: TradeInfo, transactionData: TransactionData) {
+  setTransactionData(
+    tradeInfo: TradeInfo,
+    transactionData: TransactionData,
+  ): void {
     // Existence check of table file
     try {
       fs.statSync(this.fileName);
@@ -125,12 +135,12 @@ export class TransactionInfoManagement {
       .table as string[];
 
     // Search target records / replace data
-    const transactionInfoTableNew = {
+    const transactionInfoTableNew: TransactionInfoTable = {
       table: [],
     };
-    transactionInfoTable.forEach((transactionInfoJSON, index) => {
+    transactionInfoTable.forEach((transactionInfoJSON) => {
       const transactionInfo: TransactionInfo = JSON.parse(
-        transactionInfoJSON
+        transactionInfoJSON,
       ) as TransactionInfo;
 
       // Determine if it is a target record
@@ -161,14 +171,14 @@ export class TransactionInfoManagement {
 
     // Table File Write
     const transactionInfoTableNewJson: string = JSON.stringify(
-      transactionInfoTableNew
+      transactionInfoTableNew,
     );
     fs.writeFileSync(this.fileName, transactionInfoTableNewJson, "utf8");
 
     this.fileDump();
   }
 
-  setTxInfo(tradeInfo: TradeInfo, txInfoData: TxInfoData) {
+  setTxInfo(tradeInfo: TradeInfo, txInfoData: TxInfoData): void {
     // Existence check of table file
     try {
       fs.statSync(this.fileName);
@@ -182,12 +192,12 @@ export class TransactionInfoManagement {
       .table as string[];
 
     // Search target records / replace data
-    const transactionInfoTableNew = {
+    const transactionInfoTableNew: TransactionInfoTable = {
       table: [],
     };
-    transactionInfoTable.forEach((transactionInfoJSON, index) => {
+    transactionInfoTable.forEach((transactionInfoJSON) => {
       const transactionInfo: TransactionInfo = JSON.parse(
-        transactionInfoJSON
+        transactionInfoJSON,
       ) as TransactionInfo;
 
       // Determine if it is a target record
@@ -215,7 +225,7 @@ export class TransactionInfoManagement {
 
     // Table File Write
     const transactionInfoTableNewJson: string = JSON.stringify(
-      transactionInfoTableNew
+      transactionInfoTableNew,
     );
     fs.writeFileSync(this.fileName, transactionInfoTableNewJson, "utf8");
 
@@ -229,7 +239,7 @@ export class TransactionInfoManagement {
    * @return Transaction data corresponding to txId. Returns null if it does not exist.
    *
    */
-  getTransactionInfoByTxId(txId: string): TransactionInfo {
+  getTransactionInfoByTxId(txId: string): TransactionInfo | null {
     // Existence check of table file
     try {
       fs.statSync(this.fileName);
@@ -243,13 +253,14 @@ export class TransactionInfoManagement {
       .table as string[];
 
     // Search target records
-    const transactionInfoTableNew = {
-      table: [],
-    };
+    // const transactionInfoTableNew: TransactionInfoTable = {
+    //   table: [],
+    // };
+
     let retTransactionInfo: TransactionInfo | null = null;
-    transactionInfoTable.forEach((transactionInfoJSON, index) => {
+    transactionInfoTable.forEach((transactionInfoJSON) => {
       const transactionInfo: TransactionInfo = JSON.parse(
-        transactionInfoJSON
+        transactionInfoJSON,
       ) as TransactionInfo;
 
       // Determine if it is a target record

@@ -102,7 +102,7 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
       // Get the number of transactions in account
       const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
       const method = { type: "function", command: "getNonce" };
-      const template = "default";
+
       const args = { args: { args: [fromAddress] } };
 
       logger.debug(`##getNewNonce(A): call validator#getNonce()`);
@@ -117,37 +117,39 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
           let txnCountHex: string = result.data.nonceHex;
 
           const latestNonce = getLatestNonce(fromAddress);
-          // logger.debug(`##getNewNonce(B): fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`);
-          if (txnCount <= latestNonce) {
-            // nonce correction
-            txnCount = latestNonce + 1;
-            logger.debug(
-              `##getNewNonce(C): Adjust txnCount, fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`,
-            );
+          if (latestNonce) {
+            if (txnCount <= latestNonce) {
+              // nonce correction
+              txnCount = latestNonce + 1;
+              logger.debug(
+                `##getNewNonce(C): Adjust txnCount, fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`,
+              );
 
-            const method = { type: "function", command: "toHex" };
-            const args = { args: { args: [txnCount] } };
+              const method = { type: "function", command: "toHex" };
+              const args = { args: { args: [txnCount] } };
 
-            logger.debug(`##getNewNonce(D): call validator#toHex()`);
-            verifierFactory
-              .getVerifier("84jUisrs")
-              .sendSyncRequest(contract, method, args)
-              .then((result) => {
-                txnCountHex = result.data.hexStr;
-                logger.debug(`##getNewNonce(E): txnCountHex: ${txnCountHex}`);
+              logger.debug(`##getNewNonce(D): call validator#toHex()`);
+              verifierFactory
+                .getVerifier("84jUisrs")
+                .sendSyncRequest(contract, method, args)
+                .then((result) => {
+                  txnCountHex = result.data.hexStr;
+                  logger.debug(`##getNewNonce(E): txnCountHex: ${txnCountHex}`);
 
-                // logger.debug(`##getNewNonce(F) _nonce: ${txnCount}, latestNonce: ${latestNonce}`);
-                setLatestNonce(fromAddress, txnCount);
+                  // logger.debug(`##getNewNonce(F) _nonce: ${txnCount}, latestNonce: ${latestNonce}`);
+                  setLatestNonce(fromAddress, txnCount);
 
-                return resolve({ txnCountHex: txnCountHex });
-              });
-          } else {
-            // logger.debug(`##getNewNonce(F) _nonce: ${txnCount}, latestNonce: ${latestNonce}`);
-            setLatestNonce(fromAddress, txnCount);
+                  return resolve({ txnCountHex: txnCountHex });
+                });
+            } else {
+              // logger.debug(`##getNewNonce(F) _nonce: ${txnCount}, latestNonce: ${latestNonce}`);
+              setLatestNonce(fromAddress, txnCount);
 
-            logger.debug(`##getNewNonce(G): txnCountHex: ${txnCountHex}`);
-            return resolve({ txnCountHex: txnCountHex });
+              logger.debug(`##getNewNonce(G): txnCountHex: ${txnCountHex}`);
+              return resolve({ txnCountHex: txnCountHex });
+            }
           }
+          // logger.debug(`##getNewNonce(B): fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`);
         });
     } catch (err) {
       logger.error(err);
@@ -156,7 +158,7 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
   });
 }
 
-function getLatestNonce(fromAddress: string): number {
+function getLatestNonce(fromAddress: string): number | undefined {
   if (mapFromAddressNonce.has(fromAddress)) {
     return mapFromAddressNonce.get(fromAddress); //?
   }

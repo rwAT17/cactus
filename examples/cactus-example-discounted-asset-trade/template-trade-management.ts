@@ -33,7 +33,10 @@ export class TemplateTradeManagement {
     );
   }
 
-  execTemplateTrade(functionName: string, req: Request): Promise<any> {
+  execTemplateTrade(
+    functionName: string,
+    req: Request,
+  ): Promise<VerifierFactory> {
     return new Promise((resolve, reject) => {
       const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
       const method = {};
