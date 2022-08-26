@@ -8,7 +8,7 @@
 import { RequestInfo } from "@hyperledger/cactus-cmd-socket-server";
 
 export class TransactionInfo {
-  businessLogicID: string;
+  businessLogicID = "";
   tradeID: string;
   ethereumAccountFrom: string;
   ethereumAccountTo: string;

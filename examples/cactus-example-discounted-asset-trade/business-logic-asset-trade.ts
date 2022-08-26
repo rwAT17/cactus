@@ -327,7 +327,6 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         did: did,
         schemaId: item["cred_def_id"],
       };
-
       const responseCredDef: {
         data: string[];
       } = await getDataFromIndy(args_request_getCredDef, identifierCredDef);
@@ -846,7 +845,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
   getOperationStatus(
     tradeID: string,
   ): {
-    stateInfo: number;
+    stateInfo: number | undefined;
     transactionStatus: {
       state: string;
       ledger: string;

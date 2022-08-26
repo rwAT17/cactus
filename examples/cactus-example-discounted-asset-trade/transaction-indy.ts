@@ -40,7 +40,7 @@ export function getDataFromIndy(
     schemaId: string;
   },
   identifier: string,
-): Promise<Record<string, unknown>> {
+): Promise<{ data: string[] }> {
   return new Promise(async (resolve, reject) => {
     try {
       logger.debug(`getDataFromIndy: arg_request: ${arg_request}`);
@@ -76,7 +76,7 @@ export function getDataFromIndy(
 function sendRequest(
   arg_request: Record<string, unknown>,
   identifier: string,
-): Promise<Record<string, unknown>> {
+): Promise<{ data: string[] }> {
   return new Promise(async (resolve, reject) => {
     try {
       logger.debug(`##sendRequest: arg_request: ${arg_request}`);
