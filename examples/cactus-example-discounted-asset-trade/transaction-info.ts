@@ -9,27 +9,27 @@ import { RequestInfo } from "@hyperledger/cactus-cmd-socket-server";
 
 export class TransactionInfo {
   businessLogicID = "";
-  tradeID: string;
-  ethereumAccountFrom: string;
-  ethereumAccountTo: string;
-  ethereumAccountFromKey: string;
-  ethereumAccountToKey: string;
-  fabricAccountFrom: string;
-  fabricAccountTo: string;
-  fabricAccountFromKey: string;
-  fabricAccountToKey: string;
-  tradingValue: string;
-  assetID: string;
-  status: number;
-  escrowLedger: string;
-  escrowTxID: string;
-  escrowTxInfo: string;
-  transferLedger: string;
-  transferTxID: string;
-  transferTxInfo: string;
-  settlementLedger: string;
-  settlementTxID: string;
-  settlementTxInfo: string;
+  tradeID = "";
+  ethereumAccountFrom = "";
+  ethereumAccountTo = "";
+  ethereumAccountFromKey = "";
+  ethereumAccountToKey = "";
+  fabricAccountFrom = "";
+  fabricAccountTo = "";
+  fabricAccountFromKey = "";
+  fabricAccountToKey = "";
+  tradingValue = "";
+  assetID = "";
+  status = 0;
+  escrowLedger = "";
+  escrowTxID = "";
+  escrowTxInfo = "";
+  transferLedger = "";
+  transferTxID: string | null = "";
+  transferTxInfo = "";
+  settlementLedger = "";
+  settlementTxID = "";
+  settlementTxInfo = "";
 
   constructor() {
     // Do nothing

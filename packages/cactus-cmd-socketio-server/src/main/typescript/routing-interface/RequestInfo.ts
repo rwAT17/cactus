@@ -5,12 +5,14 @@
  * RequestInfo.ts
  */
 
+import { createVerify } from "crypto";
+
 // transaction information
 
-interface proofJsonObj {
-  tradeInfo: string;
-  proof_request: string;
-  proof: string;
+export class ProofJsonObj {
+  tradeInfo = "";
+  proof_request = "";
+  proof = "";
 }
 export class TradeInfo {
   ethereumAccountFrom: string = "";
@@ -19,11 +21,7 @@ export class TradeInfo {
   fabricAccountTo: string = "";
   tradingValue: string = "";
   assetID: string = "";
-  proofJson: proofJsonObj = {
-    tradeInfo: "",
-    proof_request: "",
-    proof: "",
-  };
+  proofJson: ProofJsonObj = new ProofJsonObj();
 }
 
 // authorization information
