@@ -30,8 +30,7 @@ jobs:
       - uses: actions/checkout@v2.4.0
 
       - name: npm build
-        run: 
-
+        run: |
         npm install
         npm run --prefix ./packages/cactus-plugin-ledger-connector-sawtooth-socketio build
 
