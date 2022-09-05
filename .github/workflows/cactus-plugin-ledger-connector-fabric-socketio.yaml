@@ -30,7 +30,9 @@ jobs:
       - uses: actions/checkout@v2.4.0
 
       - name: npm build
-        run: npm run --prefix ./packages/cactus-plugin-ledger-connector-fabric-socketio build
+        run: 
+        npm install
+        npm run --prefix ./packages/cactus-plugin-ledger-connector-fabric-socketio build
 
       - name: Build image
         run: docker build $DOCKER_BUILD_DIR --file $DOCKERFILE_PATH --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
