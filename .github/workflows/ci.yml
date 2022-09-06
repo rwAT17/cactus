@@ -1,0 +1,221 @@
+---
+jobs:
+  DCI-Lint:
+    name: DCI-Lint
+    runs-on: ubuntu-20.04
+    steps:
+      - id: lint-git-repo
+        name: Lint Git Repo
+        uses: petermetz/gh-action-dci-lint@v0.6.1
+        with:
+          lint-git-repo-request: '{"cloneUrl": "${{ github.server_url }}/${{ github.repository }}.git", "fetchArgs": ["--update-head-ok", "--no-tags", "--prune", "--progress", "--no-recurse-submodules", "--depth=1", "origin" ,"+${{ github.sha }}:${{ github.ref }}"], "checkoutArgs": [ "${{ github.ref }}"], "targetPhrasePatterns": [], "configDefaultsUrl": "https://inclusivenaming.org/json/dci-lint-config-recommended-v1.json" }'
+      - name: Get the output response
+        run: echo "${{ steps.lint-git-repo.outputs.lint-git-repo-response }}"
+  build-dev:
+    continue-on-error: false
+    env:
+      DEV_BUILD_DISABLED: false
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_RUNNER_DISABLED: true
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v2.3.4
+      - run: ./tools/ci.sh
+      - id: yarn-cache-dir-path
+        name: Get yarn cache directory path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - id: yarn-cache
+        name: Initialize Yarn Cache
+        uses: actions/cache@v3.0.4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+  ghcr-cactus-example-discounted-asset-trade:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-example-discounted-asset-trade
+        run: DOCKER_BUILDKIT=1 docker build ./examples/cactus-example-discounted-asset-trade/ -f ./examples/cactus-example-discounted-asset-trade/Dockerfile
+  ghcr-cactus-example-electricity-trade:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-example-electricity-trade
+        run: DOCKER_BUILDKIT=1 docker build ./examples/cactus-example-electricity-trade/ -f ./examples/cactus-example-electricity-trade/Dockerfile
+  ghcr-carbon-accounting:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/carbon-accounting
+        run: DOCKER_BUILDKIT=1 docker build ./examples/carbon-accounting/ -f ./examples/carbon-accounting/Dockerfile
+  ghcr-register-indy-data:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/register-indy-data
+        run: DOCKER_BUILDKIT=1 docker build ./examples/register-indy-data/ -f ./examples/register-indy-data/Dockerfile
+  ghcr-supply-chain-app:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/supply-chain-app
+        run: DOCKER_BUILDKIT=1 docker build ./examples/supply-chain-app/ -f ./examples/supply-chain-app/Dockerfile
+
+  ghcr-cactus-plugin-ledger-connector-fabric-socketio:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-plugin-ledger-connector-fabric-socketio
+        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-fabric-socketio -f ./packages/cactus-plugin-ledger-connector-fabric-socketio/Dockerfile
+  ghcr-cactus-plugin-ledger-connector-go-ethereum-socketio:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
+  ghcr-cactus-plugin-ledger-connector-sawtooth-socketio:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-plugin-ledger-connector-sawtooth-socketio
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
+
+  ghcr-besu-all-in-one:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-besu-all-in-one
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
+  ghcr-cmd-api-server:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-cmd-api-server
+        run: DOCKER_BUILDKIT=1 docker build . -f ./packages/cactus-cmd-api-server/Dockerfile
+  ghcr-connector-besu:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-connector-besu
+        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-besu/ -f ./packages/cactus-plugin-ledger-connector-besu/Dockerfile
+  ghcr-connector-corda-server:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-connector-corda-server
+        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile
+  ghcr-connector-fabric:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-connector-fabric
+        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-fabric/ -f ./packages/cactus-plugin-ledger-connector-fabric/Dockerfile
+  ghcr-corda-all-in-one:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-corda-all-in-one
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/Dockerfile
+  ghcr-corda-all-in-one-flowdb:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-corda-all-in-one-flowdb
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
+  ghcr-corda-all-in-one-obligation:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-corda-all-in-one-obligation
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/corda-v4_8/Dockerfile
+  ghcr-dev-container-vscode:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-dev-container-vscode
+        run: DOCKER_BUILDKIT=1 docker build ./.devcontainer/ -f ./.devcontainer/Dockerfile
+  ghcr-example-carbon-accounting:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-example-carbon-accounting
+        run: DOCKER_BUILDKIT=1 docker build . -f ./examples/carbon-accounting/Dockerfile
+  ghcr-example-supply-chain-app:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-example-supply-chain-app
+        run: DOCKER_BUILDKIT=1 docker build . -f ./examples/supply-chain-app/Dockerfile
+  ghcr-fabric-all-in-one:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-fabric-all-in-one
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x
+  ghcr-fabric2-all-in-one:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-fabric2-all-in-one
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x
+  ghcr-iroha-all-in-one:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-iroha-all-in-one
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/iroha-all-in-one/ -f ./tools/docker/iroha-all-in-one/Dockerfile
+  ghcr-keychain-vault-server:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-keychain-vault-server
+        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/ -f ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/Dockerfile
+  ghcr-quorum-all-in-one:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-quorum-all-in-one
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-all-in-one/ -f ./tools/docker/quorum-all-in-one/Dockerfile
+  ghcr-quorum-multi-party-all-in-one:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-quorum-multi-party-all-in-one
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-multi-party-all-in-one/ -f ./tools/docker/quorum-multi-party-all-in-one/Dockerfile
+  ghcr-rust-compiler:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-rust-compiler
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/rust-compiler/ -f ./tools/docker/rust-compiler/Dockerfile
+  ghcr-test-npm-registry:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-test-npm-registry
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/test-npm-registry/ -f ./tools/docker/test-npm-registry/Dockerfile
+  ghcr-whitepaper:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: ghcr.io/hyperledger/cactus-whitepaper
+        run: DOCKER_BUILDKIT=1 docker build ./whitepaper/ -f ./whitepaper/Dockerfile
+name: Cactus_CI
+"on":
+  pull_request:
+    branches:
+      - main
+      - dev
+      - petermetz/**
+  push:
+    branches:
+      - main
+      - dev
