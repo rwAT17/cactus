@@ -1,4 +1,3 @@
----
 jobs:
   DCI-Lint:
     name: DCI-Lint
@@ -209,7 +208,8 @@ jobs:
       - name: ghcr.io/hyperledger/cactus-whitepaper
         run: DOCKER_BUILDKIT=1 docker build ./whitepaper/ -f ./whitepaper/Dockerfile
 
-ghcr-cactus-example-discounted-asset-trade:
+
+  ghcr-cactus-example-discounted-asset-trade:
     runs-on: ubuntu-20.04
     needs: build-dev
     steps:
@@ -218,6 +218,7 @@ ghcr-cactus-example-discounted-asset-trade:
         run: DOCKER_BUILDKIT=1 docker build ./examples/cactus-example-discounted-asset-trade/ -f ./examples/cactus-example-discounted-asset-trade/Dockerfile
   ghcr-cactus-example-electricity-trade:
     runs-on: ubuntu-20.04
+    needs: build-dev
     steps:
       - uses: actions/checkout@v2.3.4
       - name: ghcr.io/hyperledger/cactus-example-electricity-trade
