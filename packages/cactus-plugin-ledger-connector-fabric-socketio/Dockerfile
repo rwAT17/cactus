@@ -5,6 +5,8 @@ FROM node:14
 
 WORKDIR /root/cactus/
 
+CMD ["npm", "run", "build"]
+
 COPY ./dist/yarn.lock ./package.json ./
 RUN yarn install --production --ignore-engines --non-interactive --cache-folder ./.yarnCache; rm -rf ./.yarnCache
 
