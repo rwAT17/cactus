@@ -29,9 +29,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2.4.0
 
-      #- name: npm install
-       # run: npm install --prefix packages/cactus-plugin-ledger-connector-fabric-socketio
-
       - name: npm build
         run: npm run --prefix ./packages/cactus-plugin-ledger-connector-fabric-socketio build
 
