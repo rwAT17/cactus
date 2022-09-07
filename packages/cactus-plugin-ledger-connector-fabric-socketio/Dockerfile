@@ -5,7 +5,7 @@ FROM node:14
 
 WORKDIR /root/cactus/
 
-RUN npm run install
+RUN npm install
 RUN npm run build
 
 COPY ./dist/yarn.lock ./package.json ./

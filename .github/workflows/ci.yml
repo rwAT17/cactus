@@ -1335,7 +1335,7 @@ jobs:
       - name: ghcr.io/hyperledger/cactus-whitepaper
         run: DOCKER_BUILDKIT=1 docker build ./whitepaper/ -f ./whitepaper/Dockerfile
   #error      
-  #ghcr-cactus-example-discounted-asset-trad:
+  #ghcr-cactus-example-discounted-asset-trade:
     #needs: build-dev
     #runs-on: ubuntu-20.04
     #steps:
@@ -1364,21 +1364,21 @@ jobs:
     steps:
       - uses: actions/checkout@v2.3.4
       - name: ghcr.io/hyperledger/cactus-plugin-ledger-connector-fabric-socketio
-        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio -f ./packages/cactus-plugin-ledger-connector-fabric-socketio/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-fabric-socketio/ -f ./packages/cactus-plugin-ledger-connector-fabric-socketio/Dockerfile
   ghcr-cactus-plugin-ledger-connector-go-ethereum-socketio:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2.3.4
       - name: ghcr.io/hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio/ -f ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio/Dockerfile
   ghcr-cactus-plugin-ledger-connector-sawtooth-socketio:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2.3.4
       - name: ghcr.io/hyperledger/cactus-plugin-ledger-connector-sawtooth-socketio
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-sawtooth-socketio/ -f ./packages/cactus-plugin-ledger-connector-sawtooth-socketio/Dockerfile
 name: Cactus_CI
 'on':
   pull_request:

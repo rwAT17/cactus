@@ -6,6 +6,9 @@ ENV APP_HOME=/root/cactus
 
 WORKDIR ${APP_HOME}
 
+RUN npm install 
+RUN npm run build
+
 COPY ./dist/yarn.lock ./package.json ./
 RUN yarn add "${CACTUS_CMD_SOCKETIO_PATH}" "@hyperledger/cactus-verifier-client@${NPM_PKG_VERSION}" \
         --production --ignore-engines --non-interactive --cache-folder ./.yarnCache && \
