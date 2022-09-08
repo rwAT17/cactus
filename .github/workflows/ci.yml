@@ -1371,7 +1371,8 @@ jobs:
       - uses: actions/checkout@v2.3.4
       - name: ghcr.io/hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio
         run: |
-             npm --prefix ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio install 
+             yarn --cwd ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio install 
+ #            npm --prefix ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio install 
              npm run --prefix ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio build
              DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio/ -f ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio/Dockerfile
   ghcr-cactus-plugin-ledger-connector-sawtooth-socketio:
@@ -1381,7 +1382,8 @@ jobs:
       - uses: actions/checkout@v2.3.4
       - name: ghcr.io/hyperledger/cactus-plugin-ledger-connector-sawtooth-socketio
         run: | 
-             npm --prefix ./packages/cactus-plugin-ledger-connector-sawtooth-socketio install 
+             yarn --prefix ./packages/cactus-plugin-ledger-connector-sawtooth-socketio install 
+ #            npm --prefix ./packages/cactus-plugin-ledger-connector-sawtooth-socketio install 
              npm run --prefix ./packages/cactus-plugin-ledger-connector-sawtooth-socketio build
              DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-sawtooth-socketio/ -f ./packages/cactus-plugin-ledger-connector-sawtooth-socketio/Dockerfile
 name: Cactus_CI
