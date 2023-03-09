@@ -1,9 +1,9 @@
 /**
- * Functional test of WatchBlocksV1Endpoint on connector-fabric (packages/cactus-plugin-ledger-connector-fabric)
- * Assumes sample CC was already deployed on the test ledger.
+ * Functional tests
  *
- * @note - this test sometimes hangs infinitely when used with fabric-node-sdk 2.3.0,
- * probably due to bug in the underlying dependency grpc-js. Problem does not occur on 2.5.0.
+ *
+ * @note -
+ *
  */
 
 //////////////////////////////////
@@ -16,13 +16,10 @@ const imageName = "ghcr.io/hyperledger/cactus-fabric2-all-in-one";
 const imageVersion = "2021-09-02--fix-876-supervisord-retries";
 const fabricEnvVersion = "2.2.0";
 const fabricEnvCAVersion = "1.4.9";
-const ledgerChannelName = "mychannel";
-const ledgerContractName = "basic";
+// const ledgerChannelName = "mychannel";
+// const ledgerContractName = "basic";
 
 // Log settings
-
-const testLogLevel: LogLevelDesc = "info";
-const sutLogLevel: LogLevelDesc = "info";
 
 import "jest-extended";
 import http from "http";
@@ -32,18 +29,17 @@ import bodyParser from "body-parser";
 import express from "express";
 import { Server as SocketIoServer } from "socket.io";
 import { DiscoveryOptions } from "fabric-network";
-import { PluginFactoryPersistanceFabricBlocks } from "../../../main/typescript";
+
 import {
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 
 import {
-  LogLevelDesc,
   LoggerProvider,
-  Logger,
   IListenOptions,
   Servers,
+  LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
 import { Constants, Configuration } from "@hyperledger/cactus-core-api";
@@ -51,19 +47,32 @@ import { Constants, Configuration } from "@hyperledger/cactus-core-api";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import PostgresDatabaseClient from "../../../main/typescript/db-client/db-client";
+//import { GatewayOptions } from '../../../../../cactus-plugin-ledger-connector-fabric/dist/lib/main/typescript/generated/openapi/typescript-axios/api';
+
+// import PostgresDatabaseClient from "../../../main/typescript/db-client/db-client";
 import {
   PluginLedgerConnectorFabric,
-  FabricContractInvocationType,
   DefaultEventHandlerStrategy,
   FabricSigningCredential,
   FabricApiClient,
   GatewayOptions,
+  //WatchBlocksListenerTypeV1,
+  //WatchBlocksResponseV1,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+import { PluginPersistenceFabricBlock } from "../../../main/typescript";
 
+//////////////////////////////////
+// Constants
+//////////////////////////////////
+
+//Fabric Ledger settings
+
+const setupTimeout = 2000 * 360; // 6 minute timeout for setup
+const testLogLevel: LogLevelDesc = "info";
+const sutLogLevel: LogLevelDesc = "info";
 // Logger setup
-const log: Logger = LoggerProvider.getOrCreate({
-  label: "persistence-fabric-functional.test",
+const log = LoggerProvider.getOrCreate({
+  label: "merge_test_step_1_2.test",
   level: testLogLevel,
 });
 
@@ -77,9 +86,9 @@ describe("Persistence Fabric", () => {
   let connectorServer: http.Server;
   let socketioServer: SocketIoServer;
   let apiClient: FabricApiClient;
-  let persistence: PluginFactoryPersistanceFabricBlocks;
+  let persistence: PluginPersistenceFabricBlock;
   let gatewayOptions: GatewayOptions;
-  let dbClient: PostgresDatabaseClient;
+  // let dbClient: PostgresDatabaseClient;
 
   //////////////////////////////////
   // Environment Setup
@@ -90,12 +99,12 @@ describe("Persistence Fabric", () => {
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
 
     log.info("Create PostgresDatabaseClient");
-    dbClient = new PostgresDatabaseClient({
-      connectionString: `postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres`,
-    });
+    //dbClient = new PostgresDatabaseClient({
+    // connectionString: `postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres`,
+    // });
 
     log.info("Connect the PostgreSQL PostgresDatabaseClient");
-    await dbClient.connect();
+    //await dbClient.connect();
 
     // Start Ledger
     log.info("Start FabricTestLedgerV1...");
@@ -123,9 +132,7 @@ describe("Persistence Fabric", () => {
     const enrollAdminOut = await ledger.enrollAdmin();
     const adminWallet = enrollAdminOut[1];
     const [userIdentity] = await ledger.enrollUser(adminWallet);
-    log.warn("userIdentity", userIdentity);
-    log.warn("userIdentity", userIdentity);
-    log.warn("userIdentity", userIdentity);
+
     // Create Keychain Plugin
     const keychainId = uuidv4();
     const keychainEntryKey = "user2";
@@ -137,7 +144,7 @@ describe("Persistence Fabric", () => {
     });
 
     gatewayOptions = {
-      identity: keychainEntryKey,
+      identity: keychainEntryKey, // signingCredential
       wallet: {
         keychain: {
           keychainId,
@@ -157,6 +164,7 @@ describe("Persistence Fabric", () => {
       enabled: true,
       asLocalhost: true,
     };
+
     fabricConnectorPlugin = new PluginLedgerConnectorFabric({
       instanceId: uuidv4(),
       pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
@@ -171,7 +179,6 @@ describe("Persistence Fabric", () => {
         commitTimeout: 300,
       },
     });
-
     // Run http server
     const expressApp = express();
     expressApp.use(bodyParser.json({ limit: "250mb" }));
@@ -203,9 +210,10 @@ describe("Persistence Fabric", () => {
       apiClient,
       logLevel: testLogLevel,
       instanceId: uuidv4(),
-      connectionString: `postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres`,
+      connectionString:
+        "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",
     });
-  });
+  }, setupTimeout);
 
   afterAll(async () => {
     log.info("FINISHING THE TESTS");
@@ -215,10 +223,10 @@ describe("Persistence Fabric", () => {
       fabricConnectorPlugin.shutdown();
     }
 
-    if (apiClient) {
-      log.info("Close ApiClient connections...");
-      apiClient.close();
-    }
+    // if (apiClient) {
+    //   log.info("Close ApiClient connections...");
+    //   apiClient.close();
+    // }
 
     if (socketioServer) {
       log.info("Stop the SocketIO server connector...");
@@ -232,9 +240,6 @@ describe("Persistence Fabric", () => {
       await new Promise<void>((resolve) =>
         connectorServer.close(() => resolve()),
       );
-      if (persistence) {
-        await persistence.shutdown();
-      }
     }
 
     // Wait for monitor to be terminated
@@ -248,15 +253,6 @@ describe("Persistence Fabric", () => {
 
     log.info("Prune Docker...");
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
-
-    if (dbClient) {
-      log.info("Disconnect the PostgresDatabaseClient");
-      await dbClient.shutdown();
-    }
-  });
-
-  test("initialize persistence plugin", async () => {
-    await persistence.onPluginInit();
   });
 
   test("plugins checks", async () => {
@@ -264,124 +260,84 @@ describe("Persistence Fabric", () => {
     log.debug("###ApiClient", apiClient);
     log.debug("###Persistence", persistence);
   });
-  // getblock method test should return block data from ledger
-  // currently there is no option like "latest"
-  test("getblock", async () => {
-    const blockNumber = "1";
-    const block = await apiClient.getBlockV1({
-      channelName: ledgerChannelName,
-      gatewayOptions,
-      query: {
-        blockNumber,
-      },
-    });
 
-    log.warn("getBlockV1 response:", JSON.stringify(block.data));
+  //////////////////////////////////
+  // Tests
+  //////////////////////////////////
 
-    expect(block).toBeTruthy();
-    expect(block.status).toEqual(200);
-    expect(block.data).toBeTruthy();
+  /*
+Test Scenario III 
+1) set Last BLock to 20
+2) read LastBlock as 20
+3) migrate 2 blocks
+4) launch missing blocks
+5) check missing blocks number
+6) fill missing blocks
+7) check missing blocks number
+*/
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+
+  test(" last block setting to 6", async () => {
+    const LastBlockChanged = await persistence.setLastBlockConsidered(6);
+    log.warn("setting Lastblock from plugin for analyze");
+    log.warn(LastBlockChanged);
+  });
+  test("check last block setting to 6", async () => {
+    const LastBlockChanged = await persistence.currentLastBlock();
+    log.warn("Getting Lastblock from plugin for analyze");
+    log.warn(LastBlockChanged);
   });
 
-  // checks if method works.
-  test("isThisBlockInDB method", async () => {
-    const isThisBlockInDB = await dbClient.isThisBlockInDB(-1);
-    log.debug("isThisBlockInDB", isThisBlockInDB);
-    expect(isThisBlockInDB).toBeTruthy();
-    expect(isThisBlockInDB.rowCount).toEqual(0);
+  test("Migration of 5 block Test", async () => {
+    const blockTotest = await persistence.migrateBlockNrWithTransactions("5");
+    log.warn("Getting block from ledger for analyze");
+    log.warn(blockTotest);
+    log.warn(blockTotest);
+  });
+  test("Migration of 6 block Test", async () => {
+    const blockTotest = await persistence.migrateBlockNrWithTransactions("6");
+    log.warn("Getting block from ledger for analyze");
+    log.warn(blockTotest);
+    log.warn(blockTotest);
+  });
+  test("Migration of check Last block Test", async () => {
+    const LastBlockChanged = await persistence.currentLastBlock();
+    log.warn("Getting Lastblock from plugin for analyze");
+    log.warn(LastBlockChanged);
+  });
+  test("check missing blocks", async () => {
+    const missingBlocksCheck = await persistence.whichBlocksAreMissingInDdSimple();
+    log.warn("Getting missing blocks from plugin for analyze");
+    log.warn(JSON.stringify(missingBlocksCheck));
   });
 
-  // checks if all blocks from ledger are inserted into DB. If not, returns array with numbers of missing blocks.
-  test("log all not synchronized blocks", async () => {
-    const getMaxBlockNumber = await dbClient.getMaxBlockNumber();
-    const missedBlocks: number[] = [];
-    let howManyBlocksMissing = 0;
-
-    for (let i = getMaxBlockNumber; i >= 0; i--) {
-      try {
-        await apiClient.getBlockV1({
-          channelName: ledgerChannelName,
-          gatewayOptions,
-          query: {
-            blockNumber: `${i}`,
-          },
-        });
-        const isThisBlockInDB = await dbClient.isThisBlockInDB(i);
-        if (isThisBlockInDB.rowCount === 0) {
-          howManyBlocksMissing += 1;
-          missedBlocks.push(i);
-        }
-      } catch (err: any) {
-        const isThisBlockInDB = await dbClient.isThisBlockInDB(i);
-        if (isThisBlockInDB.rowCount === 0) {
-          howManyBlocksMissing += 1;
-          missedBlocks.push(i);
-        }
-      }
-    }
-    log.info(`missedBlocks: ${howManyBlocksMissing}`, missedBlocks);
-    expect(getMaxBlockNumber).toBeTruthy();
-  });
-  // Checking if latest block in DB is equal to the latest block on ledger.
-  // if not
-  test("block sync check", async () => {
-    const getMaxBlockNumber = await dbClient.getMaxBlockNumber();
-    const blockNumber = `${getMaxBlockNumber + 1}`;
-    log.warn("blockNumber", blockNumber);
-    log.warn("getMaxBlockNumber", getMaxBlockNumber);
-
-    try {
-      const getBlockResp = await apiClient.getBlockV1({
-        channelName: ledgerChannelName,
-        gatewayOptions,
-        query: {
-          blockNumber,
-        },
-      });
-
-      if ("decodedBlock" in getBlockResp.data) {
-        log.warn("Last block from ledger is inserted");
-      }
-    } catch (err) {
-      log.warn("Ledger and db are not in sync");
-    }
-    expect(getMaxBlockNumber).toBeTruthy();
+  test("check missing blocks count", async () => {
+    const missingBlocksCount = await persistence.showHowManyBlocksMissing();
+    log.warn("Getting missingBlocksCount from plugin for analyze");
+    log.warn(missingBlocksCount);
   });
 
-  // Inserting test data into db.
-  test("test insert", async () => {
-    const block_data = {
-      fabric_block_id: uuidv4(),
-      fabric_block_num: 1,
-      fabric_block_data: "test",
-    };
-    const response = await persistence.insertBlockDataEntry(block_data);
-
-    log.warn("insert block", response);
-    expect(response).toBeTruthy();
-    expect(response[0].command).toEqual("INSERT");
-    expect(response[0].rowCount).toEqual(1);
+  test("fill missing blocks", async () => {
+    const missingBlocksCheck = await persistence.synchronizeOnlyMissedBlocks();
+    log.warn("Getting missing blocks from plugin for analyze");
+    log.warn(JSON.stringify(missingBlocksCheck));
   });
-  //creating test transaction on ledger.
-  test("create test transaction", async () => {
-    const createAssetResponse = await apiClient.runTransactionV1({
-      signingCredential,
-      channelName: ledgerChannelName,
-      invocationType: FabricContractInvocationType.Send,
-      contractName: ledgerContractName,
-      methodName: "CreateAsset",
-      params: ["CactusTransactionsTest", "green", "111", "someOwner", "299"],
-    });
 
+  test("check missing blocks count after fill", async () => {
+    const missingBlocksCount = await persistence.showHowManyBlocksMissing();
     log.warn(
-      "runTransactionV1 response:",
-      JSON.stringify(createAssetResponse.data),
+      "After migration missing blocks getting missingBlocksCount from plugin for analyze",
     );
-
-    expect(createAssetResponse).toBeTruthy();
-    expect(createAssetResponse.status).toEqual(200);
-    expect(createAssetResponse.data).toBeTruthy();
-    expect(createAssetResponse.data.success).toBeTrue();
-    expect(createAssetResponse.data.transactionId).toBeTruthy();
+    log.warn(missingBlocksCount);
   });
+
+  /*test("Migration of check Last block Test which is in ledger", async () => {
+    const checkParameterLastBlock = await persistence.lastBlockInLedger();
+    log.warn("Getting Lastblock from plugin for analyze but the last block is set");
+    log.warn(checkParameterLastBlock);
+
+  });*/
 });

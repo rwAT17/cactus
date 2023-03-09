@@ -6,15 +6,15 @@
 // Constants
 //////////////////////////////////
 
-// const postgresImageName = "postgres";
-// const postgresImageVersion = "14.6-alpine";
+const postgresImageName = "postgres";
+const postgresImageVersion = "14.6-alpine";
 const testLogLevel: LogLevelDesc = "info";
-// const sutLogLevel: LogLevelDesc = "info";
+const sutLogLevel: LogLevelDesc = "info";
 const setupTimeout = 1000 * 60; // 1 minute timeout for setup
 
 import {
   pruneDockerAllIfGithubAction,
-  // PostgresTestContainer,
+  PostgresTestContainer,
 } from "@hyperledger/cactus-test-tooling";
 import {
   LogLevelDesc,
@@ -35,7 +35,7 @@ const log: Logger = LoggerProvider.getOrCreate({
 describe("Fabric persistence PostgreSQL PostgresDatabaseClient tests", () => {
   const testPluginName = "TestPlugin";
   const testPluginInstanceId = "testInstance";
-  // let postgresContainer: PostgresTestContainer;
+  let postgresContainer: PostgresTestContainer;
   let dbClient: PostgresDatabaseClient;
 
   //////////////////////////////////
@@ -46,13 +46,37 @@ describe("Fabric persistence PostgreSQL PostgresDatabaseClient tests", () => {
     log.info("Prune Docker...");
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
 
+    log.info("Run PostgresTestContainer...");
+    postgresContainer = new PostgresTestContainer({
+      imageName: postgresImageName,
+      imageVersion: postgresImageVersion,
+      logLevel: testLogLevel,
+      envVars: ["POSTGRES_USER=postgres", "POSTGRES_PASSWORD=postgres"],
+    });
+    await postgresContainer.start();
+
+    const postgresPort = await postgresContainer.getPostgresPort();
+    expect(postgresPort).toBeTruthy();
+    log.info(`Postgres running at localhost:${postgresPort}`);
+
     log.info("Create PostgresDatabaseClient");
     dbClient = new PostgresDatabaseClient({
-      connectionString: `postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres`,
+      connectionString: `postgresql://postgres:postgres@localhost:${postgresPort}/postgres`,
+      logLevel: sutLogLevel,
     });
 
     log.info("Connect the PostgreSQL PostgresDatabaseClient");
     await dbClient.connect();
+    await dbClient.client.query(
+      `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+       CREATE ROLE anon NOLOGIN;
+       CREATE ROLE authenticated NOLOGIN;
+       CREATE ROLE service_role NOLOGIN;
+       CREATE ROLE supabase_admin NOLOGIN;`,
+    );
+
+    log.info("Initialize the test DB Schema");
+    await dbClient.initializePlugin(testPluginName, testPluginInstanceId);
 
     log.info("Mock Supabase schema");
     log.info("Ensure DB Schema is empty (in case test is re-run on same DB");
@@ -66,18 +90,14 @@ describe("Fabric persistence PostgreSQL PostgresDatabaseClient tests", () => {
       await dbClient.shutdown();
     }
 
+    if (postgresContainer) {
+      log.info("Stop PostgreSQL...");
+      await postgresContainer.stop();
+    }
     log.info("Prune Docker...");
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
   }, setupTimeout);
-  // query the db schema located in dbClient Folder
-  test.skip("plugins checks", async () => {
-    log.info("Initialize the test DB Schema");
-    const response = await dbClient.initializePlugin(
-      testPluginName,
-      testPluginInstanceId,
-    );
-    expect(response).toBeTruthy;
-  });
+
   //insert simple BlockData into db
   test("insert into fabric_blocks", async () => {
     const block_data = {

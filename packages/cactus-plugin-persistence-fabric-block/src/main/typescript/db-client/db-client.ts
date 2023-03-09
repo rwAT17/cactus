@@ -131,7 +131,7 @@ export default class PostgresDatabaseClient {
       this.log.debug("Schema file length:", schemaSql.length);
 
       await this.client.query(schemaSql);
-      // isSchemaInitialized = true;
+      isSchemaInitialized = true;
 
       this.log.info("Schema DB initialized.");
     }

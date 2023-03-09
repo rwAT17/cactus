@@ -1,6 +1,6 @@
 import * as OpenApiJson from "../json/openapi.json";
 export { OpenApiJson };
-export { PluginPersistenceFabric } from "./plugin-factory-fabric-persistence-block";
+export { PluginFactoryPersistanceFabricBlocks } from "./plugin-factory-fabric-persistence-block";
 /*
 export {
   GetConsortiumEndpointV1,

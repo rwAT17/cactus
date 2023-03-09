@@ -45,7 +45,7 @@ export class PluginPersistenceFabricBlock
   implements ICactusPlugin, IPluginWebService {
   private log: Logger;
   public static readonly CLASS_NAME = "PluginPersistenceFabricBlock";
-  public dbClient: PostgresDatabaseClient;
+  private dbClient: PostgresDatabaseClient;
   private readonly instanceId: string;
   private apiClient: FabricApiClient;
   private endpoints: IWebServiceEndpoint[] | undefined;
@@ -73,7 +73,7 @@ export class PluginPersistenceFabricBlock
   // gateway options
   public gatewayOptions: GatewayOptions;
   // synchronization ongoing
-  public synchronizationGo:boolean = true;
+  public synchronizationGo = true;
 
   constructor(public readonly options: IPluginPersistenceFabricBlockOptions) {
     const level = this.options.logLevel || "INFO";
@@ -172,7 +172,7 @@ export class PluginPersistenceFabricBlock
   public getInstanceId(): string {
     return this.instanceId;
   }
- // this is just test function to check if you correctly created instance of plugin
+  // this is just test function to check if you correctly created instance of plugin
   public async helloWorldTest(): Promise<string> {
     return new Promise<string>((resolve) => {
       resolve("hello World test");
@@ -223,8 +223,7 @@ export class PluginPersistenceFabricBlock
     return endpoints;
   }
 
-  
-  // current last block from ledger ( not in database ) 
+  // current last block from ledger ( not in database )
   public currentLastBlock(): number {
     return this.lastBlock;
   }
@@ -283,13 +282,13 @@ export class PluginPersistenceFabricBlock
     } while (moreBlocks);
     return this.lastBlock;
   }
-/**  Synchronization of blocks
- * - Synchronize entire first 30 blocks of ledger state 
- * with the database as a good start and to check if everything is correctly set.
- * @returns string promise done after finishing the process
- * // future changes - parameter to set which part of blokchain to move to database
- */
- 
+  /**  Synchronization of blocks
+   * - Synchronize entire first 30 blocks of ledger state
+   * with the database as a good start and to check if everything is correctly set.
+   * @returns string promise done after finishing the process
+   * // future changes - parameter to set which part of blokchain to move to database
+   */
+
   async initialBlocksSynchronization(): Promise<string> {
     let tempBlockNumber = 0;
     let blockNumber = tempBlockNumber.toString();
@@ -339,13 +338,12 @@ export class PluginPersistenceFabricBlock
     return "done";
   }
 
-/**  Synchronization of blocks
- * - Synchronize entire ledger state 
- * with the database as far as the lastBlockInLedger shows ( triggered once )
- * @returns string promise lastBlock number after finishing the process
- * 
- */
-
+  /**  Synchronization of blocks
+   * - Synchronize entire ledger state
+   * with the database as far as the lastBlockInLedger shows ( triggered once )
+   * @returns string promise lastBlock number after finishing the process
+   *
+   */
 
   async continueBlocksSynchronization(): Promise<string> {
     this.synchronizationGo = true;
@@ -393,7 +391,7 @@ export class PluginPersistenceFabricBlock
             moreBlocks = false;
           }
         }
-        if(this.synchronizationGo == false){
+        if (this.synchronizationGo == false) {
           moreBlocks = false;
         }
       } else {
@@ -403,13 +401,12 @@ export class PluginPersistenceFabricBlock
     return "done";
   }
 
-
   /**  Synchronization of blocks
- * - Synchronize entire ledger state 
- * with the database as far as the lastBlockInLedger shows ( triggered more than once )
- * @returns string promise lastBlock number after finishing the process
- * 
- */
+   * - Synchronize entire ledger state
+   * with the database as far as the lastBlockInLedger shows ( triggered more than once )
+   * @returns string promise lastBlock number after finishing the process
+   *
+   */
   // NOTE: this function can loop into very long almost infinite loop or even
   // infinite loop depends on time of generating block < time writing to database
   async continuousBlocksSynchronization(): Promise<string> {
@@ -458,7 +455,7 @@ export class PluginPersistenceFabricBlock
           tempBlockNumber = tempBlockNumber + 1;
           blockNumber = tempBlockNumber.toString();
         }
-        if(this.synchronizationGo == false){
+        if (this.synchronizationGo == false) {
           moreBlocks = false;
         }
       } else {
@@ -496,8 +493,8 @@ export class PluginPersistenceFabricBlock
   // Migration of block nr with transaction inside
   // NOTE that each block have at least 1 transaction endorsement
   /**
-   * 
-   * @param blockNumber this is parameter of function which set 
+   *
+   * @param blockNumber this is parameter of function which set
    * block number to be moved from ledger to database
    * @returns true a boolean which indicates successfull migration
    */
@@ -541,7 +538,8 @@ export class PluginPersistenceFabricBlock
       return false;
     }
     for (let txIndex = 0; txIndex < txLen; txIndex++) {
-      const transactionDataObject = tempBlockParse.decodedBlock.data.data[txIndex];
+      const transactionDataObject =
+        tempBlockParse.decodedBlock.data.data[txIndex];
       const transactionDataStringifies = JSON.stringify(transactionDataObject);
 
       let txid = "";
@@ -565,11 +563,13 @@ export class PluginPersistenceFabricBlock
       if (envelope_signature !== undefined) {
         envelope_signature = Buffer.from(envelope_signature).toString("hex");
       }
-      let payload_extension = transactionDataObject.payload.header.channel_header.extension;
+      let payload_extension =
+        transactionDataObject.payload.header.channel_header.extension;
       if (payload_extension !== undefined) {
         payload_extension = Buffer.from(payload_extension).toString("hex");
       }
-      creator_nonce = transactionDataObject.payload.header.signature_header.nonce;
+      creator_nonce =
+        transactionDataObject.payload.header.signature_header.nonce;
       if (creator_nonce !== undefined) {
         creator_nonce = Buffer.from(creator_nonce).toString("hex");
       }
@@ -860,5 +860,14 @@ If some blocks above this number are already in database they will not be remove
       this.log.error(message);
       throw new RuntimeError(message, this.getRuntimeErrorCause(error));
     }
+  }
+
+  public async insertBlockDataEntry(
+    data: Record<string, unknown>,
+  ): Promise<any> {
+    console.log(data);
+    const test = this.dbClient.insertBlockDataEntry(data);
+    this.log.warn(test);
+    return test;
   }
 }
