@@ -449,8 +449,9 @@ describe("Persistence Fabric", () => {
     }
     if (postgresContainer) {
       log.info("Disconnect the PostgresDatabaseClient");
+
       await postgresContainer.stop();
-      await postgresContainer.destroy();
+      // await postgresContainer.destroy();
     }
 
     // Wait for monitor to be terminated
@@ -493,7 +494,7 @@ describe("Persistence Fabric", () => {
     const blockNumber = "1";
     const block = await persistence.getBlockFromLedger(blockNumber);
 
-    log.warn("getBlockV1 response:", JSON.stringify(block.data));
+    log.warn("getBlockV1 response:", JSON.stringify(block));
 
     expect(block).toBeTruthy();
   });
