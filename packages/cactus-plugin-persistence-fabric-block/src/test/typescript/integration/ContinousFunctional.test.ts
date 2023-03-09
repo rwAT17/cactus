@@ -73,7 +73,7 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   PluginLedgerConnectorFabric,
-  FabricContractInvocationType,
+  // FabricContractInvocationType,
   DefaultEventHandlerStrategy,
   FabricSigningCredential,
   FabricApiClient,
@@ -539,25 +539,25 @@ describe("Persistence Fabric", () => {
   });
 
   //creating test transaction on ledger.
-  test.skip("create test transaction", async () => {
-    const createAssetResponse = await apiClient.runTransactionV1({
-      signingCredential,
-      channelName: ledgerChannelName,
-      invocationType: FabricContractInvocationType.Send,
-      contractName: ledgerContractName,
-      methodName: "CreateAsset",
-      params: ["CactusTransactionsTest", "green", "111", "someOwner", "299"],
-    });
+  // test.skip("create test transaction", async () => {
+  //   const createAssetResponse = await persistence.runTransactionV1({
+  //     signingCredential,
+  //     channelName: ledgerChannelName,
+  //     invocationType: FabricContractInvocationType.Send,
+  //     contractName: ledgerContractName,
+  //     methodName: "CreateAsset",
+  //     params: ["CactusTransactionsTest", "green", "111", "someOwner", "299"],
+  //   });
 
-    log.warn(
-      "runTransactionV1 response:",
-      JSON.stringify(createAssetResponse.data),
-    );
+  //   log.warn(
+  //     "runTransactionV1 response:",
+  //     JSON.stringify(createAssetResponse.data),
+  //   );
 
-    expect(createAssetResponse).toBeTruthy();
-    expect(createAssetResponse.status).toEqual(200);
-    expect(createAssetResponse.data).toBeTruthy();
-    expect(createAssetResponse.data.success).toBeTrue();
-    expect(createAssetResponse.data.transactionId).toBeTruthy();
-  });
+  //   expect(createAssetResponse).toBeTruthy();
+  //   expect(createAssetResponse.status).toEqual(200);
+  //   expect(createAssetResponse.data).toBeTruthy();
+  //   expect(createAssetResponse.data.success).toBeTrue();
+  //   expect(createAssetResponse.data.transactionId).toBeTruthy();
+  // });
 });
