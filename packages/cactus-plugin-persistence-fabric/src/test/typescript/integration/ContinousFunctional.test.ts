@@ -33,7 +33,7 @@ const ledgerUserName = "appUser";
 const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
 const leaveLedgerRunning = true; // default: false
-const useRunningLedger = true; // default: false
+const useRunningLedger = false; // default: false
 
 /////////////////////////////////
 
@@ -515,13 +515,14 @@ describe("Persistence Fabric", () => {
 
     for (let i = getMaxBlockNumber; i >= 0; i--) {
       try {
-        await apiClient.getBlockV1({
-          channelName: ledgerChannelName,
-          gatewayOptions,
-          query: {
-            blockNumber: `${i}`,
-          },
-        });
+        persistence.getBlockFromLedger(`${i}`);
+        // await apiClient.getBlockV1({
+        //   channelName: ledgerChannelName,
+        //   gatewayOptions,
+        //   query: {
+        //     blockNumber: `${i}`,
+        //   },
+        // });
         const isThisBlockInDB = await dbClient.isThisBlockInDB(i);
         if (isThisBlockInDB.rowCount === 0) {
           howManyBlocksMissing += 1;
