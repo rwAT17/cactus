@@ -33,7 +33,7 @@ const ledgerUserName = "appUser";
 const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
 const leaveLedgerRunning = true; // default: false
-const useRunningLedger = false; // default: false
+const useRunningLedger = true; // default: false
 
 /////////////////////////////////
 
