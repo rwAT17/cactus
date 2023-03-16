@@ -244,7 +244,6 @@ export class PluginPersistenceFabric
    * lastBlockInLedger
    * @returns this.lastBlock which is last block in ledger assuming using getBlock and node js SDK
    */
-
   public async lastBlockInLedger(): Promise<number> {
     let tempBlockNumber = this.lastBlock;
     let blockNumber = tempBlockNumber.toString();
@@ -263,6 +262,12 @@ export class PluginPersistenceFabric
         this.log.info("Last block in ledger", tempBlockNumber - 1);
         moreBlocks = false;
       }
+      this.log.warn(
+        "getBlockV1 nr:",
+        blockNumber,
+        " response: ",
+        JSON.stringify(block.data),
+      );
 
       if (block.status == 200) {
         if (moreBlocks) {
@@ -305,6 +310,8 @@ export class PluginPersistenceFabric
 
       if (block.status == 200) {
         const logBlock = JSON.stringify(block.data);
+
+        this.log.warn("getBlockV1 response:", logBlock);
 
         // Put scrapped block into database
         this.log.info(logBlock);
@@ -357,6 +364,12 @@ export class PluginPersistenceFabric
         this.log.info("Last block in ledger", tempBlockNumber - 1);
         moreBlocks = false;
       }
+      this.log.warn(
+        "getBlockV1 nr:",
+        blockNumber,
+        " response: ",
+        JSON.stringify(block.data),
+      );
 
       if (block.status == 200) {
         const tempBlockstep1 = JSON.stringify(block.data);
@@ -415,6 +428,12 @@ export class PluginPersistenceFabric
         this.log.info("Last block in ledger", tempBlockNumber - 1);
         moreBlocks = false;
       }
+      this.log.warn(
+        "getBlockV1 nr:",
+        blockNumber,
+        " response: ",
+        JSON.stringify(block.data),
+      );
 
       if (block.status == 200) {
         const tempBlockstep1 = JSON.stringify(block.data);
@@ -465,7 +484,12 @@ export class PluginPersistenceFabric
     });
 
     const tempBlockParse = block.data;
-
+    this.log.warn(
+      "getting block nr:",
+      blockNumber,
+      " with data: ",
+      JSON.stringify(block.data),
+    );
     return tempBlockParse;
   }
 
@@ -488,7 +512,14 @@ export class PluginPersistenceFabric
       },
     });
 
-    let tempBlockParse: any;
+    let tempBlockParse;
+    this.log.warn(
+      "inserting into database block nr:",
+      blockNumber,
+      " with data: ",
+      ((tempBlockParse = JSON.parse(JSON.stringify(block.data))),
+      JSON.stringify(block.data)),
+    );
 
     const hash = Buffer.from(
       tempBlockParse.decodedBlock.header.data_hash.data,
@@ -710,6 +741,8 @@ export class PluginPersistenceFabric
       this.lastSeenBlock = Number(blockNumber);
     }
 
+    //this.log.warn("data migrated");
+
     return true;
   }
   /**
@@ -739,14 +772,27 @@ If some blocks above this number are already in database they will not be remove
    */
   public async whichBlocksAreMissingInDdSimple(): Promise<void> {
     this.howManyBlocksMissing = 0;
-    this.log.info(
+    this.log.warn(
       "Last block for start search missing blocks: ",
       this.lastBlock,
     );
     for (let iterator: number = this.lastBlock; iterator >= 0; iterator--) {
+      this.log.warn("search in database block nr: ", iterator);
       const isThisBlockPresent = await this.dbClient.isThisBlockInDB(iterator);
-
+      this.log.warn("Answer from database is: ", isThisBlockPresent);
+      this.log.warn("missedBlocks", JSON.stringify(this.missedBlocks));
+      this.log.warn("missedBlocks raw", this.missedBlocks);
+      this.log.warn(
+        "missedBlocks raw",
+        this.missedBlocks[this.howManyBlocksMissing],
+      );
+      this.log.warn("Answer for query about block in DB ", isThisBlockPresent);
+      this.log.warn(
+        "Answer for query about block in DB stringify",
+        JSON.stringify(isThisBlockPresent),
+      );
       if (isThisBlockPresent.rowCount === 0) {
+        this.log.warn("missing block nr", iterator);
         this.missedBlocks.push(iterator.toString());
         this.howManyBlocksMissing += 1;
       }
@@ -828,7 +874,8 @@ If some blocks above this number are already in database they will not be remove
     data: Record<string, unknown>,
   ): Promise<any> {
     console.log(data);
-    const result = this.dbClient.insertBlockDataEntry(data);
-    return result;
+    const test = this.dbClient.insertBlockDataEntry(data);
+    this.log.warn(test);
+    return test;
   }
 }
