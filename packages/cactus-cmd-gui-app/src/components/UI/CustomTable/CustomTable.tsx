@@ -1,8 +1,10 @@
 import { Component, createSignal, createEffect, onCleanup } from "solid-js";
 import { TableProps, TableProperty } from "../../../schema/supabase-types";
+
+import EmptyTablePlaceholder from "./EmptyTablePlaceholder/EmptyTablePlaceholder";
 // @ts-expect-error
 import styles from "./CustomTable.module.css";
-import EmptyTablePlaceholder from "./EmptyTablePlaceholder/EmptyTablePlaceholder";
+
 
 const CustomTable: Component<{ cols: TableProps; data: any[] }> = (props) => {
 

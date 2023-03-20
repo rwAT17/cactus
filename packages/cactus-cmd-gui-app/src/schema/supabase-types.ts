@@ -101,3 +101,11 @@ export interface balanceDate {
   created_at: string;
   balance: number;
 }
+
+export interface FabricTxnItem {
+
+}
+
+export interface FabricBlockItem {
+  
+}

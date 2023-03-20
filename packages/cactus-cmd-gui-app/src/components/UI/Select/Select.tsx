@@ -23,7 +23,7 @@ const Select: Component<{
     selectStartLedgerByUrl(startLocation) || options[0],
   );
 
-  const selectOption = (item) => {
+  const selectOption = (item: any) => {
     setSelectedOption(item);
     props.onSelect(item.value);
     setDropdownVisible(false);

@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.base.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
@@ -8,7 +8,7 @@
             "name": "typescript-plugin-css-modules"
         }
     ],
-    "composite": true,
+    "lib": ["ES2015", "dom"],
     "outDir": "./dist/out-tsc",
     "rootDir": "./src",
     "skipLibCheck": true,
