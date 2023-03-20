@@ -703,7 +703,7 @@ describe("Persistence Fabric", () => {
     expect(initialBlocksSynchronization).toEqual("done");
   });
 
-  // Those are other test scenarios when we check not missing block but normal synchronziation
+  // Those are other test scenarios when we check not missing block but normal synchronization
   // test("continueBlocksSynchronization", async () => {
   //   const continueBlocksSynchronization = await persistence.continueBlocksSynchronization();
   //   expect(continueBlocksSynchronization).toBeTruthy();

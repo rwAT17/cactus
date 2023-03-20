@@ -17,7 +17,7 @@ import {
 } from "@hyperledger/cactus-core-api";
 
 // errors
-import { RuntimeError } from "run-time-error";
+//import { RuntimeError } from "run-time-error";
 
 import { Mutex } from "async-mutex";
 import type { Express } from "express";
