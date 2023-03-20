@@ -32,8 +32,8 @@ const fabricEnvCAVersion = "1.4.9";
 const ledgerUserName = "appUser";
 const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
-const leaveLedgerRunning = false; // default: false
-const useRunningLedger = false; // default: false
+const leaveLedgerRunning = true; // default: false
+const useRunningLedger = true; // default: false
 
 /////////////////////////////////
 
@@ -504,6 +504,12 @@ describe("Persistence Fabric", () => {
 
   // getblock method test should return block data from ledger
   // currently there is no option like "latest"
+  test("onPluginInit creates DB schema and fetches the monitored tokens", async () => {
+    await persistence.onPluginInit();
+    const initDBCalls = dbClientInstance.initializePlugin.mock.calls;
+    expect(initDBCalls.length).toBe(1);
+    expect(persistence).toBeTruthy();
+  });
   test("getblock", async () => {
     const blockNumber = "1";
     const block = await persistence.getBlockFromLedger(blockNumber);
@@ -520,7 +526,6 @@ describe("Persistence Fabric", () => {
       methodName: "CreateAsset",
       params: ["CactusTransactionsTest1", "green", "111", "someOwner", "299"],
     });
-
 
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
@@ -540,7 +545,6 @@ describe("Persistence Fabric", () => {
       params: ["CactusTransactionsTest2", "blue", "111", "someOwner1", "299"],
     });
 
-
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
     expect(createAssetResponse.data).toBeTruthy();
@@ -558,7 +562,6 @@ describe("Persistence Fabric", () => {
       methodName: "CreateAsset",
       params: ["CactusTransactionsTest3", "blue", "13331", "someOwner3", "299"],
     });
-
 
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
@@ -578,7 +581,6 @@ describe("Persistence Fabric", () => {
       params: ["CactusTransactionsTest4", "yellow", "111", "someOwner1", "299"],
     });
 
-
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
     expect(createAssetResponse.data).toBeTruthy();
@@ -596,7 +598,6 @@ describe("Persistence Fabric", () => {
       methodName: "CreateAsset",
       params: ["CactusTransactionsTest5", "black", "121", "someOwner3", "199"],
     });
-
 
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
@@ -616,7 +617,6 @@ describe("Persistence Fabric", () => {
       params: ["CactusTransactionsTest6", "blue", "112", "someOwner1", "219"],
     });
 
-
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
     expect(createAssetResponse.data).toBeTruthy();
@@ -634,7 +634,6 @@ describe("Persistence Fabric", () => {
       methodName: "CreateAsset",
       params: ["CactusTransactionsTest7", "yellow", "111", "someOwner3", "229"],
     });
-
 
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
@@ -654,7 +653,6 @@ describe("Persistence Fabric", () => {
       params: ["CactusTransactionsTest8", "blue", "2111", "someOwner3", "2119"],
     });
 
-
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
     expect(createAssetResponse.data).toBeTruthy();
@@ -664,7 +662,7 @@ describe("Persistence Fabric", () => {
   // checks if method works.
 
   // checks if all blocks from ledger are inserted into DB. If not, returns array with numbers of missing blocks.
-  test("log all not synchronized blocks", async () => {
+  test.only("log all not synchronized blocks", async () => {
     getMaxBlockNumberMock(11);
     const getMaxBlockNumber = await dbClientInstance.getMaxBlockNumber(11);
     const missedBlocks: number[] = [];
@@ -789,12 +787,11 @@ describe("Persistence Fabric", () => {
   });
 
   test("check missing blocks count after fill inside database", async () => {
-    const missingBlocksCount = await persistence.showHowManyBlocksMissing();
+    const missingBlocksCount = persistence.showHowManyBlocksMissing();
     log.info(
       "After migration missing blocks getting missingBlocksCount from plugin for analyze",
       missingBlocksCount,
     );
     expect(missingBlocksCount).toBe(0);
   });
-
 });
