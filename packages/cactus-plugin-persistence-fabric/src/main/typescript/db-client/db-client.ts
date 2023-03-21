@@ -154,7 +154,7 @@ export default class PostgresDatabaseClient {
     return insertResponse;
   }
 
-  public async insertBlockDetails(block: any): Promise<void> {
+  public async insertBlockDetails(block: any): Promise<any> {
     this.assertConnected();
 
     const insertResponse = await this.client.query(
@@ -172,11 +172,10 @@ export default class PostgresDatabaseClient {
     this.log.info(
       `Inserted ${insertResponse.rowCount} rows into table fabric_blocks`,
     );
+    return insertResponse;
   }
 
-  public async insertBlockTransactionEntry(
-    transactions: any,
-  ): Promise<Record<string, unknown>[]> {
+  public async insertBlockTransactionEntry(transactions: any): Promise<any> {
     this.assertConnected();
 
     const insertResponse: any = await this.client.query(
@@ -193,9 +192,7 @@ export default class PostgresDatabaseClient {
     return insertResponse;
   }
 
-  public async insertDetailedTransactionEntry(
-    transactions: any,
-  ): Promise<void> {
+  public async insertDetailedTransactionEntry(transactions: any): Promise<any> {
     this.assertConnected();
 
     const insertResponse = await this.client.query(
@@ -228,6 +225,7 @@ export default class PostgresDatabaseClient {
     this.log.info(
       `Inserted ${insertResponse.rowCount} rows into table fabric_transactions_entry`,
     );
+    return insertResponse;
   }
 
   public async getMaxBlockNumber(): Promise<number> {
