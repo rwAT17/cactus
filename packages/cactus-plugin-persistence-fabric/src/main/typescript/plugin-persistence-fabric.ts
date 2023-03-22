@@ -310,10 +310,10 @@ export class PluginPersistenceFabric
         this.log.info(logBlock);
         this.log.info("Block number: ", blockNumber);
 
-        if (!this.isConnected) {
-          await this.dbClient.connect();
-          this.isConnected = true;
-        }
+        // if (!this.isConnected) {
+        //   await this.dbClient.connect();
+        //   this.isConnected = true;
+        // }
         if (moreBlocks) {
           await this.migrateBlockNrWithTransactions(blockNumber);
           this.lastSeenBlock = tempBlockNumber;
@@ -364,10 +364,10 @@ export class PluginPersistenceFabric
         // Put scrapped block into database
         this.log.info(tempBlock);
 
-        if (!this.isConnected) {
-          await this.dbClient.connect();
-          this.isConnected = true;
-        }
+        // if (!this.isConnected) {
+        //   await this.dbClient.connect();
+        //   this.isConnected = true;
+        // }
         if (moreBlocks) {
           await this.migrateBlockNrWithTransactions(blockNumber);
           this.lastSeenBlock = tempBlockNumber;
@@ -422,10 +422,10 @@ export class PluginPersistenceFabric
         // Put scrapped block into database
         this.log.info(tempBlock);
 
-        if (!this.isConnected) {
-          await this.dbClient.connect();
-          this.isConnected = true;
-        }
+        // if (!this.isConnected) {
+        //   await this.dbClient.connect();
+        //   this.isConnected = true;
+        // }
         if (moreBlocks) {
           await this.migrateBlockNrWithTransactions(blockNumber);
           this.lastSeenBlock = tempBlockNumber;
@@ -499,10 +499,10 @@ export class PluginPersistenceFabric
       fabric_block_num: Number(blockNumber),
       fabric_block_data: block.data,
     };
-    if (!this.isConnected) {
-      await this.dbClient.connect();
-      this.isConnected = true;
-    }
+    // if (!this.isConnected) {
+    //   await this.dbClient.connect();
+    //   this.isConnected = true;
+    // }
 
     // Put scrapped block into database
     const txLen = tempBlockParse.decodedBlock.data.data.length;
@@ -620,10 +620,10 @@ export class PluginPersistenceFabric
             .channel_header.tx_id;
       }
 
-      const read_set:string = JSON.stringify(readSet, null, 2);
-      const write_set:string = JSON.stringify(writeSet, null, 2);
+      const read_set: string = JSON.stringify(readSet, null, 2);
+      const write_set: string = JSON.stringify(writeSet, null, 2);
 
-      const chaincode_id:string = JSON.stringify(chaincodeID);
+      const chaincode_id: string = JSON.stringify(chaincodeID);
 
       let chaincodename: string = "";
       // checking if proposal_response_payload is present and operational
@@ -807,7 +807,7 @@ If some blocks above this number are already in database they will not be remove
     const toMigrate: number = this.lastBlock + 1;
     try {
       const block = await this.migrateBlockNrWithTransactions(
-        (toMigrate).toString(),
+        toMigrate.toString(),
       );
       this.lastSeenBlock = toMigrate;
       return toMigrate;
