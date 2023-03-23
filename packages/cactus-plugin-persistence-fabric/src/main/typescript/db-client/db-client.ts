@@ -14,7 +14,8 @@ import {
 
 import fs from "fs";
 import path from "path";
-import { Client as PostgresClient } from "pg";
+import { Client as PostgresClient, QueryResult } from "pg";
+// import { InsertBlockDataInterface } from "../types";
 // import { RuntimeError } from "run-time-error";
 
 //////////////////////////////////
@@ -141,7 +142,7 @@ export default class PostgresDatabaseClient {
     );
   }
 
-  public async insertBlockDataEntry(block: any): Promise<any> {
+  public async insertBlockDataEntry(block: any): Promise<QueryResult> {
     this.assertConnected();
 
     const insertResponse = await this.client.query(
@@ -154,7 +155,9 @@ export default class PostgresDatabaseClient {
     return insertResponse;
   }
 
-  public async insertBlockDetails(block: any): Promise<any> {
+  public async insertBlockDetails(
+    block: Record<string, unknown>,
+  ): Promise<QueryResult> {
     this.assertConnected();
 
     const insertResponse = await this.client.query(
@@ -172,6 +175,7 @@ export default class PostgresDatabaseClient {
     this.log.info(
       `Inserted ${insertResponse.rowCount} rows into table fabric_blocks`,
     );
+
     return insertResponse;
   }
 
@@ -192,7 +196,9 @@ export default class PostgresDatabaseClient {
     return insertResponse;
   }
 
-  public async insertDetailedTransactionEntry(transactions: any): Promise<any> {
+  public async insertDetailedTransactionEntry(
+    transactions: Record<string, unknown>,
+  ): Promise<any> {
     this.assertConnected();
 
     const insertResponse = await this.client.query(

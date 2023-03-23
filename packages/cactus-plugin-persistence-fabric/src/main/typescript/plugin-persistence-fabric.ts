@@ -25,11 +25,16 @@ import type { Express } from "express";
 import {
   GatewayOptions,
   FabricApiClient,
+  GetBlockResponseV1,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 
 import PostgresDatabaseClient from "./db-client/db-client";
 
 import OAS from "../json/openapi.json";
+//types and interfaces
+import { AxiosResponse } from "axios";
+import { QueryResult } from "pg";
+import { getStatusReturn, InsertBlockDataInterface } from "./types";
 
 //import { BlockTransactionObject } from "web3-eth"; //
 
@@ -131,7 +136,7 @@ export class PluginPersistenceFabric
   // }
   //
   //
-  public getStatus(): any {
+  public getStatus(): getStatusReturn {
     return {
       instanceId: this.instanceId,
       connected: this.isConnected,
@@ -247,7 +252,14 @@ export class PluginPersistenceFabric
   public async lastBlockInLedger(): Promise<number> {
     let tempBlockNumber = this.lastBlock;
     let blockNumber = tempBlockNumber.toString();
-    let block: any;
+    let block: AxiosResponse = {
+      data: undefined,
+      status: 0,
+      statusText: "",
+      headers: undefined,
+      config: {},
+      request: undefined,
+    };
     let moreBlocks = true;
     do {
       try {
@@ -287,7 +299,14 @@ export class PluginPersistenceFabric
   async initialBlocksSynchronization(edgeOfLedger: number): Promise<string> {
     let tempBlockNumber = 0;
     let blockNumber = tempBlockNumber.toString();
-    let block: any;
+    let block: AxiosResponse = {
+      data: undefined,
+      status: 0,
+      statusText: "string",
+      headers: undefined,
+      config: {},
+      request: undefined,
+    };
     let moreBlocks = true;
     do {
       try {
@@ -342,7 +361,14 @@ export class PluginPersistenceFabric
     let tempBlockNumber = this.lastSeenBlock;
     let blockNumber = tempBlockNumber.toString();
     this.lastBlock = await this.lastBlockInLedger();
-    let block: any;
+    let block: AxiosResponse = {
+      data: undefined,
+      status: 0,
+      statusText: "",
+      headers: undefined,
+      config: {},
+      request: undefined,
+    };
     let moreBlocks = true;
     do {
       try {
@@ -400,7 +426,14 @@ export class PluginPersistenceFabric
     let tempBlockNumber = this.lastSeenBlock;
     let blockNumber = tempBlockNumber.toString();
     this.lastBlock = await this.lastBlockInLedger();
-    let block: any;
+    let block: AxiosResponse = {
+      data: undefined,
+      status: 0,
+      statusText: "",
+      headers: undefined,
+      config: {},
+      request: undefined,
+    };
     let moreBlocks = true;
     do {
       try {
@@ -454,7 +487,7 @@ export class PluginPersistenceFabric
     return this.synchronizationGo;
   }
 
-  async getBlockFromLedger(blockNumber: string): Promise<any> {
+  async getBlockFromLedger(blockNumber: string): Promise<GetBlockResponseV1> {
     const block = await this.apiClient.getBlockV1({
       channelName: this.ledgerChannelName,
       gatewayOptions: this.gatewayOptions,
@@ -463,6 +496,7 @@ export class PluginPersistenceFabric
       },
       skipDecode: false,
     });
+    this.log.warn("Barbana", block);
 
     const tempBlockParse = block.data;
 
@@ -488,7 +522,7 @@ export class PluginPersistenceFabric
       },
     });
 
-    const tempBlockParse: any = JSON.parse(JSON.stringify(block.data));
+    const tempBlockParse = JSON.parse(JSON.stringify(block.data));
 
     const hash = Buffer.from(
       tempBlockParse.decodedBlock.header.data_hash.data,
@@ -773,7 +807,9 @@ If some blocks above this number are already in database they will not be remove
           },
         });
 
-        let tempBlockParse = JSON.parse(JSON.stringify(block.data));
+        let tempBlockParse: GetBlockResponseV1 = JSON.parse(
+          JSON.stringify(block.data),
+        );
         if (block.status == 200) {
           // Put scrapped block into database
 
@@ -819,9 +855,8 @@ If some blocks above this number are already in database they will not be remove
   }
 
   public async insertBlockDataEntry(
-    data: Record<string, unknown>,
-  ): Promise<any> {
-    console.log(data);
+    data: InsertBlockDataInterface,
+  ): Promise<QueryResult> {
     const test = this.dbClient.insertBlockDataEntry(data);
 
     return test;

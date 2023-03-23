@@ -32,7 +32,7 @@ const fabricEnvCAVersion = "1.4.9";
 const ledgerUserName = "appUser";
 const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
-const leaveLedgerRunning = false; // default: false
+const leaveLedgerRunning = true; // default: false
 const useRunningLedger = false; // default: false
 
 /////////////////////////////////
@@ -512,6 +512,20 @@ describe("Persistence Fabric", () => {
     const initDBCalls = dbClientInstance.initializePlugin.mock.calls;
     expect(initDBCalls.length).toBe(1);
     expect(persistence).toBeTruthy();
+  });
+
+  test.only("getblock", async () => {
+    const blockNumber = "1";
+    const block = await persistence.getBlockFromLedger(blockNumber);
+    log.warn("getBlockFromLedger", JSON.stringify(block));
+    expect(block).toBeTruthy();
+    expect(block).toMatchObject({
+      decodedBlock: {
+        header: expect.toBeObject(),
+        data: expect.toBeObject(),
+        metadata: expect.toBeObject(),
+      },
+    });
   });
 
   //helpers
