@@ -6,7 +6,7 @@ import {
   Checks,
   Logger,
   LoggerProvider,
-  // LogLevelDesc,
+  LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
 //   import { Database as DatabaseSchemaType } from "./database.types";
@@ -15,8 +15,18 @@ import {
 import fs from "fs";
 import path from "path";
 import { Client as PostgresClient, QueryResult } from "pg";
-// import { InsertBlockDataInterface } from "../types";
+import {
+  InsertBlockDataEntryInterface,
+  InsertBlockDetailsInterface,
+  InsertBlockTransactionEntryInterface,
+  InsertDetailedTransactionEntryInterface,
+} from "../types";
 // import { RuntimeError } from "run-time-error";
+
+export interface PostgresDatabaseClientOptions {
+  connectionString: string;
+  logLevel: LogLevelDesc;
+}
 
 //////////////////////////////////
 // PostgresDatabaseClient
@@ -35,7 +45,7 @@ export default class PostgresDatabaseClient {
   public client: PostgresClient;
   public isConnected = false;
 
-  constructor(public options: any) {
+  constructor(public options: PostgresDatabaseClientOptions) {
     const fnTag = `${PostgresDatabaseClient.CLASS_NAME}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(
@@ -142,7 +152,9 @@ export default class PostgresDatabaseClient {
     );
   }
 
-  public async insertBlockDataEntry(block: any): Promise<QueryResult> {
+  public async insertBlockDataEntry(
+    block: InsertBlockDataEntryInterface,
+  ): Promise<QueryResult> {
     this.assertConnected();
 
     const insertResponse = await this.client.query(
@@ -156,7 +168,7 @@ export default class PostgresDatabaseClient {
   }
 
   public async insertBlockDetails(
-    block: Record<string, unknown>,
+    block: InsertBlockDetailsInterface,
   ): Promise<QueryResult> {
     this.assertConnected();
 
@@ -179,10 +191,12 @@ export default class PostgresDatabaseClient {
     return insertResponse;
   }
 
-  public async insertBlockTransactionEntry(transactions: any): Promise<any> {
+  public async insertBlockTransactionEntry(
+    transactions: InsertBlockTransactionEntryInterface,
+  ): Promise<QueryResult> {
     this.assertConnected();
 
-    const insertResponse: any = await this.client.query(
+    const insertResponse: QueryResult = await this.client.query(
       `INSERT INTO public.fabric_transactions_entry("id", "block_id", "transaction_data") VALUES ($1, $2, $3)`,
       [
         transactions.transaction_id,
@@ -197,8 +211,8 @@ export default class PostgresDatabaseClient {
   }
 
   public async insertDetailedTransactionEntry(
-    transactions: Record<string, unknown>,
-  ): Promise<any> {
+    transactions: InsertDetailedTransactionEntryInterface,
+  ): Promise<QueryResult> {
     this.assertConnected();
 
     const insertResponse = await this.client.query(
@@ -243,7 +257,7 @@ export default class PostgresDatabaseClient {
     return +response.rows[0].max;
   }
 
-  public async isThisBlockInDB(block_num: number): Promise<any> {
+  public async isThisBlockInDB(block_num: number): Promise<QueryResult> {
     this.assertConnected();
     const response = await this.client.query(
       `select * from public.fabric_blocks_entry where block_num = $1`,

@@ -34,7 +34,7 @@ import OAS from "../json/openapi.json";
 //types and interfaces
 import { AxiosResponse } from "axios";
 import { QueryResult } from "pg";
-import { getStatusReturn, InsertBlockDataInterface } from "./types";
+import { getStatusReturn, InsertBlockDataEntryInterface } from "./types";
 
 //import { BlockTransactionObject } from "web3-eth"; //
 
@@ -252,8 +252,8 @@ export class PluginPersistenceFabric
   public async lastBlockInLedger(): Promise<number> {
     let tempBlockNumber = this.lastBlock;
     let blockNumber = tempBlockNumber.toString();
-    let block: AxiosResponse = {
-      data: undefined,
+    let block: AxiosResponse<GetBlockResponseV1> = {
+      data: { decodedBlock: {} },
       status: 0,
       statusText: "",
       headers: undefined,
@@ -300,7 +300,7 @@ export class PluginPersistenceFabric
     let tempBlockNumber = 0;
     let blockNumber = tempBlockNumber.toString();
     let block: AxiosResponse = {
-      data: undefined,
+      data: { decodedBlock: {} },
       status: 0,
       statusText: "string",
       headers: undefined,
@@ -362,7 +362,7 @@ export class PluginPersistenceFabric
     let blockNumber = tempBlockNumber.toString();
     this.lastBlock = await this.lastBlockInLedger();
     let block: AxiosResponse = {
-      data: undefined,
+      data: { decodedBlock: {} },
       status: 0,
       statusText: "",
       headers: undefined,
@@ -427,7 +427,7 @@ export class PluginPersistenceFabric
     let blockNumber = tempBlockNumber.toString();
     this.lastBlock = await this.lastBlockInLedger();
     let block: AxiosResponse = {
-      data: undefined,
+      data: { decodedBlock: {} },
       status: 0,
       statusText: "",
       headers: undefined,
@@ -496,7 +496,6 @@ export class PluginPersistenceFabric
       },
       skipDecode: false,
     });
-    this.log.warn("Barbana", block);
 
     const tempBlockParse = block.data;
 
@@ -531,7 +530,7 @@ export class PluginPersistenceFabric
     const block_data = {
       fabric_block_id: hash,
       fabric_block_num: Number(blockNumber),
-      fabric_block_data: block.data,
+      fabric_block_data: JSON.stringify(block.data),
     };
     // if (!this.isConnected) {
     //   await this.dbClient.connect();
@@ -855,7 +854,7 @@ If some blocks above this number are already in database they will not be remove
   }
 
   public async insertBlockDataEntry(
-    data: InsertBlockDataInterface,
+    data: InsertBlockDataEntryInterface,
   ): Promise<QueryResult> {
     const test = this.dbClient.insertBlockDataEntry(data);
 

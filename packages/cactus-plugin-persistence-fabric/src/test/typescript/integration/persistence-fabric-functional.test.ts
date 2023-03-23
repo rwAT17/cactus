@@ -686,9 +686,8 @@ describe("Persistence Fabric", () => {
     const insertBlockDataEntry = await persistence.insertBlockDataEntry(
       dataForInsert,
     );
-    // expect(insertBlockDataEntry).toBeTruthy();
-    // expect(insertBlockDataEntry.).toEqual();
-    // expect(insertBlockDataEntry).toBeTruthy();
+
+    expect(insertBlockDataEntry).toBeTruthy();
     // expect(insertBlockDataEntry).toBeTruthy();
     log.warn("insertBlockDataEntry", insertBlockDataEntry);
   });
