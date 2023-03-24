@@ -31,6 +31,7 @@ import {
 import PostgresDatabaseClient from "./db-client/db-client";
 
 import OAS from "../json/openapi.json";
+
 //types and interfaces
 import { AxiosResponse } from "axios";
 import { QueryResult } from "pg";
@@ -299,7 +300,7 @@ export class PluginPersistenceFabric
   async initialBlocksSynchronization(edgeOfLedger: number): Promise<string> {
     let tempBlockNumber = 0;
     let blockNumber = tempBlockNumber.toString();
-    let block: AxiosResponse = {
+    let block: AxiosResponse<GetBlockResponseV1> = {
       data: { decodedBlock: {} },
       status: 0,
       statusText: "string",
@@ -329,7 +330,7 @@ export class PluginPersistenceFabric
         this.log.info(logBlock);
         this.log.info("Block number: ", blockNumber);
 
-        // if (!this.isConnected) {
+        // if (!this.dbClient.isConnected) {
         //   await this.dbClient.connect();
         //   this.isConnected = true;
         // }
@@ -358,10 +359,11 @@ export class PluginPersistenceFabric
    */
 
   async continueBlocksSynchronization(): Promise<string> {
+    this.lastSeenBlock = await this.dbClient.getMaxBlockNumber();
     let tempBlockNumber = this.lastSeenBlock;
     let blockNumber = tempBlockNumber.toString();
     this.lastBlock = await this.lastBlockInLedger();
-    let block: AxiosResponse = {
+    let block: AxiosResponse<GetBlockResponseV1> = {
       data: { decodedBlock: {} },
       status: 0,
       statusText: "",
@@ -390,7 +392,7 @@ export class PluginPersistenceFabric
         // Put scrapped block into database
         this.log.info(tempBlock);
 
-        // if (!this.isConnected) {
+        // if (!this.dbClient.isConnected) {
         //   await this.dbClient.connect();
         //   this.isConnected = true;
         // }
@@ -422,11 +424,12 @@ export class PluginPersistenceFabric
   // NOTE: this function can loop into very long almost infinite loop or even
   // infinite loop depends on time of generating block < time writing to database
   async continuousBlocksSynchronization(): Promise<string> {
+    this.lastSeenBlock = await this.dbClient.getMaxBlockNumber();
     this.synchronizationGo = true;
-    let tempBlockNumber = this.lastSeenBlock;
+    let tempBlockNumber = this.lastSeenBlock; //last block migrated to database
     let blockNumber = tempBlockNumber.toString();
     this.lastBlock = await this.lastBlockInLedger();
-    let block: AxiosResponse = {
+    let block: AxiosResponse<GetBlockResponseV1> = {
       data: { decodedBlock: {} },
       status: 0,
       statusText: "",
@@ -434,7 +437,7 @@ export class PluginPersistenceFabric
       config: {},
       request: undefined,
     };
-    let moreBlocks = true;
+    let checkBlock = true;
     do {
       try {
         block = await this.apiClient.getBlockV1({
@@ -446,7 +449,6 @@ export class PluginPersistenceFabric
         });
       } catch (error) {
         this.log.info("Last block in ledger", tempBlockNumber - 1);
-        moreBlocks = false;
       }
 
       if (block.status == 200) {
@@ -455,27 +457,36 @@ export class PluginPersistenceFabric
         // Put scrapped block into database
         this.log.info(tempBlock);
 
-        // if (!this.isConnected) {
+        // if (!this.dbClient.isConnected) {
         //   await this.dbClient.connect();
         //   this.isConnected = true;
         // }
-        if (moreBlocks) {
+        tempBlockNumber = tempBlockNumber + 1;
+        const isThisBlockPresent = await this.dbClient.isThisBlockInDB(
+          tempBlockNumber,
+        );
+
+        if (isThisBlockPresent.rowCount === 0) {
+          checkBlock = true;
+        } else {
+          checkBlock = false; // this block is in database so skip it
+        }
+
+        if (checkBlock) {
           await this.migrateBlockNrWithTransactions(blockNumber);
           this.lastSeenBlock = tempBlockNumber;
           if (tempBlockNumber > this.lastBlock) {
             this.lastBlock = tempBlockNumber;
           }
-          tempBlockNumber = tempBlockNumber + 1;
-          blockNumber = tempBlockNumber.toString();
         }
         if (!this.synchronizationGo) {
-          moreBlocks = false;
+          checkBlock = false;
         }
-      } else {
-        moreBlocks = false;
       }
-    } while (moreBlocks);
-    return "done";
+      blockNumber = tempBlockNumber.toString();
+      this.lastBlock = await this.lastBlockInLedger();
+    } while (this.synchronizationGo);
+    return "stopped";
   }
 
   async changeSynchronization(): Promise<boolean> {
@@ -488,14 +499,16 @@ export class PluginPersistenceFabric
   }
 
   async getBlockFromLedger(blockNumber: string): Promise<GetBlockResponseV1> {
-    const block = await this.apiClient.getBlockV1({
-      channelName: this.ledgerChannelName,
-      gatewayOptions: this.gatewayOptions,
-      query: {
-        blockNumber,
+    const block: AxiosResponse<GetBlockResponseV1> = await this.apiClient.getBlockV1(
+      {
+        channelName: this.ledgerChannelName,
+        gatewayOptions: this.gatewayOptions,
+        query: {
+          blockNumber,
+        },
+        skipDecode: false,
       },
-      skipDecode: false,
-    });
+    );
 
     const tempBlockParse = block.data;
 
@@ -513,13 +526,15 @@ export class PluginPersistenceFabric
   public async migrateBlockNrWithTransactions(
     blockNumber: string,
   ): Promise<boolean> {
-    const block = await this.apiClient.getBlockV1({
-      channelName: this.ledgerChannelName,
-      gatewayOptions: this.gatewayOptions,
-      query: {
-        blockNumber,
+    const block: AxiosResponse<GetBlockResponseV1> = await this.apiClient.getBlockV1(
+      {
+        channelName: this.ledgerChannelName,
+        gatewayOptions: this.gatewayOptions,
+        query: {
+          blockNumber,
+        },
       },
-    });
+    );
 
     const tempBlockParse = JSON.parse(JSON.stringify(block.data));
 
@@ -532,7 +547,7 @@ export class PluginPersistenceFabric
       fabric_block_num: Number(blockNumber),
       fabric_block_data: JSON.stringify(block.data),
     };
-    // if (!this.isConnected) {
+    // if (!this.dbClient.isConnected) {
     //   await this.dbClient.connect();
     //   this.isConnected = true;
     // }
@@ -611,7 +626,7 @@ export class PluginPersistenceFabric
           for (const input of chaincode_proposal_input) {
             inputs =
               (inputs === "" ? inputs : `${inputs},`) +
-              Buffer.from(input).toString("utf8");
+              Buffer.from(input).toString("hex");
           }
           chaincode_proposal_input = inputs;
         }
@@ -798,13 +813,15 @@ If some blocks above this number are already in database they will not be remove
       this.log.info("database start Synchronization");
       do {
         blockNumber = this.missedBlocks[missedIndex];
-        const block = await this.apiClient.getBlockV1({
-          channelName: this.ledgerChannelName,
-          gatewayOptions: this.gatewayOptions,
-          query: {
-            blockNumber,
+        const block: AxiosResponse<GetBlockResponseV1> = await this.apiClient.getBlockV1(
+          {
+            channelName: this.ledgerChannelName,
+            gatewayOptions: this.gatewayOptions,
+            query: {
+              blockNumber,
+            },
           },
-        });
+        );
 
         let tempBlockParse: GetBlockResponseV1 = JSON.parse(
           JSON.stringify(block.data),
@@ -856,6 +873,7 @@ If some blocks above this number are already in database they will not be remove
   public async insertBlockDataEntry(
     data: InsertBlockDataEntryInterface,
   ): Promise<QueryResult> {
+    console.log(data);
     const test = this.dbClient.insertBlockDataEntry(data);
 
     return test;
