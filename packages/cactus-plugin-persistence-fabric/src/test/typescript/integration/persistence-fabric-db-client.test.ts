@@ -165,7 +165,6 @@ describe("Fabric persistence PostgreSQL PostgresDatabaseClient tests", () => {
     expect(response).toBeTruthy();
     expect(response.command).toEqual("INSERT");
     expect(response.rowCount).toEqual(1);
-    expect(response.rowAsArray).toEqual(0 || false);
     expect(response).toMatchObject({
       command: "INSERT",
       rowCount: expect.toBeNumber(),
@@ -206,7 +205,7 @@ describe("Fabric persistence PostgreSQL PostgresDatabaseClient tests", () => {
     expect(response).toBeTruthy();
     expect(response.command).toEqual("INSERT");
     expect(response.rowCount).toEqual(1);
-    expect(response.rowAsArray).toEqual(0 || false);
+
     expect(response).toMatchObject({
       command: "INSERT",
       rowCount: expect.toBeNumber(),

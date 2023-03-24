@@ -1,10 +1,3 @@
-export interface GetBlockV1ResponseDecoded {
-  decodedBlock: any;
-}
-export interface GetBlockV1ResponseEncoded {
-  encodedBlock: any;
-}
-
 export interface BlockDataResponse {
   decodedBlock: {
     header: Record<string, unknown>;
@@ -47,7 +40,7 @@ export interface InsertDetailedTransactionEntryInterface {
   transaction_id: string;
   createdat: string;
   chaincodename: string;
-  status: string;
+  status: number;
   creator_msp_id: string;
   endorser_msp_id: string;
   chaincode_id: string;
