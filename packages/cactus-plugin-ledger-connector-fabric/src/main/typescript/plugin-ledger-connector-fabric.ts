@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import * as fabricprototypes from "fabric-protos";
 
 import { Certificate } from "@fidm/x509";
 import { Express } from "express";
@@ -951,8 +952,10 @@ export class PluginLedgerConnectorFabric
   protected async createGateway(req: RunTransactionRequest): Promise<Gateway> {
     if (req.gatewayOptions) {
       return this.createGatewayWithOptions(req.gatewayOptions);
-    } else {
+    } else if (req.signingCredential) {
       return this.createGatewayLegacy(req.signingCredential);
+    } else {
+      throw new Error("Missing either gatewayOptions or signingCredential");
     }
   }
 
@@ -1102,6 +1105,23 @@ export class PluginLedgerConnectorFabric
       let transactionId = "";
       switch (invocationType) {
         case FabricContractInvocationType.Call: {
+          if (fnName === "getLastBlock") {
+            const result = await contract.evaluateTransaction(
+              "GetChainInfo",
+              ...params,
+            );
+
+            const blockProto = JSON.stringify(
+              fabricprototypes.common.BlockchainInfo.decode(result),
+            );
+            const lastBlockPreview = JSON.parse(blockProto);
+            this.log.info("lastBlockPreview ", lastBlockPreview.height);
+            this.log.info(lastBlockPreview.height.toString());
+            this.log.info(blockProto);
+            out = lastBlockPreview.height;
+            success = true;
+            break;
+          }
           out = await contract.evaluateTransaction(fnName, ...params);
           success = true;
           break;
