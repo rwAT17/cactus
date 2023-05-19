@@ -1,6 +1,6 @@
 # country=$(sort-package-json "package.json" --check )
 sort-package-json "**/cactus-*/package.json" --check 
-
+echo test
 if [ $? -eq 0 ]
 then
     echo 'Each package was already sorted.'
