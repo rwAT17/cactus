@@ -1,4 +1,4 @@
-country=$(sort-package-json "package.json" --check )
+country=$(sort-package-json "**/cactus-*/package.json" --check )
 
 # if [ $? -eq 0 ]
 # then
