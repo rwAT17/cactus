@@ -52,22 +52,22 @@
     "@iroha2/crypto-core": "0.1.1",
     "@iroha2/crypto-target-node": "0.4.0",
     "@iroha2/data-model": "3.0.0",
+    "fast-safe-stringify": "2.1.1",
     "hada": "0.0.8",
     "rxjs": "7.3.0",
-    "fast-safe-stringify": "2.1.1",
     "sanitize-html": "2.7.0",
     "undici": "5.10.0"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "1.1.3",
     "@hyperledger/cactus-plugin-keychain-memory": "1.1.3",
+    "@hyperledger/cactus-test-tooling": "1.1.3",
     "@types/express": "4.17.8",
     "@types/sanitize-html": "2.6.2",
-    "socket.io": "4.4.1",
-    "uuid": "8.3.2",
     "body-parser": "1.19.0",
     "jest": "28.1.0",
-    "jest-extended": "2.0.0"
+    "jest-extended": "2.0.0",
+    "socket.io": "4.4.1",
+    "uuid": "8.3.2"
   },
   "engines": {
     "node": ">=12",

@@ -12,9 +12,9 @@ echo test
 # fi
 
 if [[ "${country}" =~ 'was already sorted' ]]; then
-echo 0 'was already sorted.'
+echo 0 'already sorted.'
 	exit 0
 else 
-echo 1 'was not sorted'
+echo 1 'not sorted'
 	exit 1
 fi

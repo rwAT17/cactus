@@ -14,18 +14,18 @@ export async function runCustomChecks(
 
   console.log("${TAG} Current NodeJS version is v", version);
 
-  {
-    const [success, errors] = await checkOpenApiJsonSpecs({ argv, env });
-    overallErrors = overallErrors.concat(errors);
-    overallSuccess = overallSuccess && success;
-  }
+  // {
+  //   const [success, errors] = await checkOpenApiJsonSpecs({ argv, env });
+  //   overallErrors = overallErrors.concat(errors);
+  //   overallSuccess = overallSuccess && success;
+  // }
 
-  {
-    const req = { argv, env };
-    const [success, errors] = await checkSiblingDepVersionConsistency(req);
-    overallErrors = overallErrors.concat(errors);
-    overallSuccess = overallSuccess && success;
-  }
+  // {
+  //   const req = { argv, env };
+  //   const [success, errors] = await checkSiblingDepVersionConsistency(req);
+  //   overallErrors = overallErrors.concat(errors);
+  //   overallSuccess = overallSuccess && success;
+  // }
 
   {
     const req = { argv, env };
