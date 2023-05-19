@@ -1,12 +1,20 @@
 # country=$(sort-package-json "package.json" --check )
 sort-package-json "**/cactus-*/package.json" --check 
 echo test
-if [ $? -eq 0 ]
-then
-    echo 'Each package was already sorted.'
+# if [ $? -eq 0 ]
+# then
+#     echo 'Each package was already sorted.'
+# 	exit 0
+# else 
+#     echo 'At least one package was not sorted 
+# run /tools/custom-checks/check-package-json-sort.ts or "npm run custom-checks"'
+# 	exit 1
+# fi
+
+if [[ "${country}" =~ 'was already sorted' ]]; then
+echo 0 'was already sorted.'
 	exit 0
 else 
-    echo 'At least one package was not sorted 
-run /tools/custom-checks/check-package-json-sort.ts or "npm run custom-checks"'
+echo 1 'was not sorted'
 	exit 1
 fi
