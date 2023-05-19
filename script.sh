@@ -11,7 +11,7 @@ echo test
 # 	exit 1
 # fi
 
-if [[ "${country}" =~ 'was already sorted' ]]; then
+if [[ "${country}" =~ 'already sorted' ]]; then
 echo 0 'already sorted.'
 	exit 0
 else 
