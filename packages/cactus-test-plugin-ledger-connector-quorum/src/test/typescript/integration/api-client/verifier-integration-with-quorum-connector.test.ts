@@ -18,6 +18,7 @@ import "jest-extended";
 import lodash from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import Web3 from "web3";
+import { WebsocketProviderOptions } from "web3-core-helpers";
 import { AbiItem } from "web3-utils";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
@@ -112,9 +113,19 @@ describe("Verifier integration with quorum connector tests", () => {
     plugins.push(keychainPlugin);
 
     log.info("Create PluginLedgerConnectorQuorum...");
+
+    const wsProviderOptions: WebsocketProviderOptions = {
+      clientConfig: {
+        // Useful if requests are large
+        maxReceivedFrameSize: 100000000,
+        maxReceivedMessageSize: 100000000,
+      },
+    };
+
     connector = new PluginLedgerConnectorQuorum({
       rpcApiHttpHost: connectionProfile.quorum.member1.url,
       rpcApiWsHost: connectionProfile.quorum.member1.wsUrl,
+      wsProviderOptions: wsProviderOptions,
       logLevel: sutLogLevel,
       instanceId: uuidv4(),
       pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
@@ -268,6 +279,30 @@ describe("Verifier integration with quorum connector tests", () => {
         abi: HelloWorldContractJson.abi as AbiItem[],
         address: deployOut.transactionReceipt.contractAddress as string,
       };
+    });
+
+    test("Using verifier for calling getBlock method works", async () => {
+      const correctContract: Record<string, unknown> = lodash.clone(
+        contractCommon,
+      );
+
+      const correctMethod: Record<string, unknown> = {
+        type: "web3Eth",
+        command: "call",
+        function: "getBlock",
+        params: ["latest"],
+      };
+
+      const correctArgs: any = {};
+
+      const resultCorrect = await verifier.sendSyncRequest(
+        correctContract,
+        correctMethod,
+        correctArgs,
+      );
+
+      expect(resultCorrect.data).toBeTruthy();
+      expect(resultCorrect.status).toEqual(200);
     });
 
     test("Invalid web3EthContract calls are rejected by QuorumApiClient", async () => {
@@ -500,9 +535,27 @@ describe("Verifier integration with quorum connector tests", () => {
         methodCall,
         argsCall,
       );
+      log.error(resultsCall);
       expect(resultsCall.status).toEqual(200);
       expect(resultsCall.data).toEqual(newName);
     });
+  });
+
+  test("web3 provider options check", async () => {
+    const connectorResponse = await connector.invokeRawWeb3EthMethod({
+      methodName: "getPastLogs",
+      params: [
+        {
+          fromBlock: "1",
+          toBlock: "3",
+        },
+      ],
+    });
+    expect(connectorResponse).toBeTruthy();
+
+    log.warn("resultCorrect:", connectorResponse);
+    log.info("resultCorrect:", connectorResponse);
+    log.error("resultCorrect:", connectorResponse);
   });
 
   test("Verifier of QuorumApiClient supports web3Eth function", async () => {

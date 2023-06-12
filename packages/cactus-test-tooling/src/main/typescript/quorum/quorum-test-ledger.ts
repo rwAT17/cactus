@@ -105,6 +105,10 @@ export class QuorumTestLedger implements ITestLedger {
     const hostPort = await this.getRpcApiPublicPort();
     return `http://${ipAddress}:${hostPort}`;
   }
+  public async getRpcApiWsHost(): Promise<string> {
+    const ipAddress = "127.0.0.1";
+    return `ws://${ipAddress}:8546`;
+  }
 
   public async getFileContents(filePath: string): Promise<string> {
     const response: NodeJS.ReadableStream = await this.getContainer().getArchive(
