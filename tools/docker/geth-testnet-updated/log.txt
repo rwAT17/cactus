@@ -1,0 +1,11 @@
+
+Your new key was generated
+
+Public address of the key:   0x439E35dA5c5d78074f456A8C8fc4E2ad7aD585Ea
+Path of the secret key file: /Users/alice/ethereum/keystore/UTC--2023-07-03T14-35-46.552042021Z--439e35da5c5d78074f456a8c8fc4e2ad7ad585ea
+
+- You can share your public address with anyone. Others need it to interact with you.
+- You must NEVER share the secret key with anyone! The key controls access to your funds!
+- You must BACKUP your key file! Without the key, it's impossible to access account funds!
+- You must REMEMBER your password! Without the password, it's impossible to decrypt the key!
+
