@@ -1,26 +1,21 @@
-import { Component, createSignal, createEffect, onCleanup } from "solid-js";
 import { TableProps, TableProperty } from "../../../schema/supabase-types";
 
 import EmptyTablePlaceholder from "./EmptyTablePlaceholder/EmptyTablePlaceholder";
 // @ts-expect-error
 import styles from "./CustomTable.module.css";
 
-
-const CustomTable: Component<{ cols: TableProps; data: any[] }> = (props) => {
-
+function CustomTable(props) {
   const [viewport, setViewport] = createSignal("");
 
-createEffect(() => {
-  const screenResized = () =>
-    setViewport(window.innerWidth <= 1699 ? "small" : "wide");
-  screenResized();
-  window.addEventListener("resize", screenResized, true);
-  onCleanup(() => {
-    window.removeEventListener("resize", screenResized, true);
+  createEffect(() => {
+    const screenResized = () =>
+      setViewport(window.innerWidth <= 1699 ? "small" : "wide");
+    screenResized();
+    window.addEventListener("resize", screenResized, true);
+    return () => {
+      window.removeEventListener("resize", screenResized, true);
+    };
   });
-});
-
-
 
   const getObjPropVal = (objProp: string[], row: any) => {
     if (objProp.length === 1) return row[objProp[0]];
@@ -103,6 +98,6 @@ createEffect(() => {
       )}
     </>
   );
-};
+}
 
 export default CustomTable;

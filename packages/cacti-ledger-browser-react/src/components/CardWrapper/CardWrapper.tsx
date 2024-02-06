@@ -1,66 +1,51 @@
-import {
-  createSignal,
-  createEffect,
-  ParentComponent,
-  onCleanup,
-} from "solid-js";
-import { TbCactus } from "solid-icons/tb";
-import { useNavigate } from "@solidjs/router";
 import Button from "../UI/Button/Button";
 import Search from "../UI/Search/Search";
-import CustomTable from "../UI/CustomTable/CustomTable";
-import { TableProps } from "../../schema/supabase-types";
-import Pagination from "../Pagination/Pagination";
-// @ts-expect-error
-import styles from "./CardWrapper.module.css";
-import EmptyTablePlaceholder from "../UI/CustomTable/EmptyTablePlaceholder/EmptyTablePlaceholder";
 
-type cardWrapperProp = {
-  filters?: string[];
-  data: any[];
-  display: string;
-  trimmed?: boolean;
-  columns?: TableProps;
-  title: string;
-  getSearchValue?: (val: string) => {};
-};
+import CustomTable from "../UI/CustomTable/CustomTable";
+// import { TableProps } from "../../schema/supabase-types";
+import Pagination from "../Pagination/Pagination";
+
+import styles from "./CardWrapper.module.css";
+import EmptyTablePlaceholder from "";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const pageSize: number = 6;
 
-const CardWrapper: ParentComponent<cardWrapperProp> = (props) => {
+function CardWrapper(props) {
   const navigate = useNavigate();
-  const [searchKey, setSearchKey] = createSignal("");
-  const [filteredData, setFilteredData] = createSignal<any[]>([]);
-  const [paginatedData, setPaginatedData] = createSignal<any[]>([]);
-  const [currentPage, setCurrentPage] = createSignal<number>(1);
-  const [totalPages, setTotalPages] = createSignal<number>(1);
-  const [viewport, setViewport] = createSignal("");
+  const [searchKey, setSearchKey] = useState("");
+  const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [paginatedData, setPaginatedData] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [viewport, setViewport] = useState("");
 
   const handleGoToPage = (pageNumber: number) => {
-    if (pageNumber < 1 || pageNumber > totalPages()) return;
+    if (pageNumber < 1 || pageNumber > totalPages) return;
     setCurrentPage(pageNumber);
   };
 
   const handleNextPage = () => {
-    if (currentPage() === totalPages()) return;
+    if (currentPage === totalPages) return;
     setCurrentPage((prev) => prev + 1);
   };
 
   const handlePrevPage = () => {
-    if (currentPage() === 1) return;
+    if (currentPage === 1) return;
     setCurrentPage((prev) => prev - 1);
   };
 
   const filterData = () => {
     const { filters, data } = props;
-    if (searchKey().length === 0) {
+    if (searchKey.length === 0) {
       setFilteredData(data);
       return;
     }
     let newData = data.filter((row) => {
       let isMatch: boolean = false;
       filters?.forEach((property) => {
-        if (row[property]?.toString().toLowerCase().includes(searchKey())) {
+        if (row[property]?.toString().toLowerCase().includes(searchKey)) {
           isMatch = true;
         }
       });
@@ -72,51 +57,49 @@ const CardWrapper: ParentComponent<cardWrapperProp> = (props) => {
   const handleSearch = () => {
     filterData();
     if (props.getSearchValue) {
-      props.getSearchValue(searchKey());
+      props.getSearchValue(searchKey);
     }
   };
 
-  createEffect(() => {
+  useEffect(() => {
     setFilteredData(props.data);
   });
 
-  createEffect(() => {
+  useEffect(() => {
     const screenResized = () =>
       setViewport(window.innerWidth <= 1699 ? "small" : "wide");
     screenResized();
     window.addEventListener("resize", screenResized, true);
-    onCleanup(() => {
+    return () => {
       window.removeEventListener("resize", screenResized, true);
-    });
+    };
   });
 
-  createEffect(() => {
-    if (filteredData().length <= pageSize) {
-      setPaginatedData(filteredData());
+  useEffect(() => {
+    if (filteredData.length <= pageSize) {
+      setPaginatedData(filteredData);
     } else {
-      const firstEl = currentPage() * pageSize - pageSize;
-      setPaginatedData(filteredData().slice(firstEl, firstEl + pageSize));
+      const firstEl = currentPage * pageSize - pageSize;
+      setPaginatedData(filteredData.slice(firstEl, firstEl + pageSize));
     }
   });
 
-  createEffect(() => {
-    const pageNum = Math.ceil(filteredData().length / pageSize);
+  useEffect(() => {
+    const pageNum = Math.ceil(filteredData.length / pageSize);
     setTotalPages(pageNum);
   });
 
   return (
     <section
-      class={`${styles["wrapper"]} ${
+      className={`${styles["wrapper"]} ${
         props.display === "small"
           ? styles["wrapper-half-width"]
           : styles["wrapper-full-width"]
       }`}
     >
-      <header class={styles["wrapper-header"]}>
-        <span class={styles["wrapper-title"]}>
-          <TbCactus /> {props.title}
-        </span>
-        {props.trimmed && viewport() === "small" && (
+      <header className={styles["wrapper-header"]}>
+        <span className={styles["wrapper-title"]}></span>
+        {props.trimmed && viewport === "small" && (
           <Button
             type={"primary"}
             onClick={() => navigate(`./${props.title.toLowerCase()}`)}
@@ -125,7 +108,7 @@ const CardWrapper: ParentComponent<cardWrapperProp> = (props) => {
           </Button>
         )}
         {props.filters && (
-          <div class={styles["wrapper-search"]}>
+          <div className={styles["wrapper-search"]}>
             <Search
               onKeyUp={(e) => setSearchKey(e)}
               type="text"
@@ -135,15 +118,15 @@ const CardWrapper: ParentComponent<cardWrapperProp> = (props) => {
           </div>
         )}
       </header>
-      <div class={styles["wrapper-cards"]}>
+      <div className={styles["wrapper-cards"]}>
         {props?.columns && props.data?.length > 0 && (
-          <CustomTable cols={props.columns} data={paginatedData()} />
+          <CustomTable cols={props.columns} data={paginatedData} />
         )}
         {props?.data?.length === 0 && <EmptyTablePlaceholder />}
       </div>
-      <div class={styles["wrapper-btns"]}>
+      <div className={styles["wrapper-btns"]}>
         {" "}
-        {props.trimmed && viewport() === "wide" && (
+        {props.trimmed && viewport === "wide" && (
           <Button
             type={"primary"}
             onClick={() => navigate(`./${props.title.toLowerCase()}`)}
@@ -154,8 +137,8 @@ const CardWrapper: ParentComponent<cardWrapperProp> = (props) => {
       </div>
       {!props.trimmed && (
         <Pagination
-          current={currentPage()}
-          total={totalPages()}
+          current={currentPage}
+          total={totalPages}
           goToPage={handleGoToPage}
           goNextPage={handleNextPage}
           goPrevPage={handlePrevPage}
@@ -163,6 +146,6 @@ const CardWrapper: ParentComponent<cardWrapperProp> = (props) => {
       )}
     </section>
   );
-};
+}
 
 export default CardWrapper;

@@ -19,7 +19,9 @@ const Menu = () => {
 
   const handleSelect = (selectedValue: string) => {
     setActiveLedger(selectedValue);
-    navigate(`/${activeLedger()}`);
+    console.log(activeLedger);
+    navigate(`/${activeLedger}`);
+    console.log(location);
   };
 
   createEffect(() => {

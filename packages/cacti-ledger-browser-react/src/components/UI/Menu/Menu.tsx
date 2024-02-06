@@ -27,7 +27,8 @@ function Menu() {
   const [activeLedger, setActiveLedger] = useState("");
   const handleSelect = (selectedValue: string) => {
     setActiveLedger(selectedValue);
-    navigate(`/${activeLedger}`);
+
+    navigate(`/${selectedValue}`);
   };
 
   useEffect(() => {
@@ -59,6 +60,7 @@ function Menu() {
       <Select
         value={activeLedger}
         onSelect={(val: string) => {
+          // console.log("xddd");
           handleSelect(val);
         }}
       />
