@@ -1,14 +1,8 @@
-import { Component, createSignal } from "solid-js";
-import { BiRegularReset } from "solid-icons/bi";
-// @ts-expect-error
+import { useState } from "react";
 import styles from "./Search.module.css";
 
-const Search: Component<{
-  type: string;
-  onKeyUp: (value: string) => void;
-  placeholder: string;
-}> = (props) => {
-  const [val, setValue] = createSignal<string>("");
+function Search(props) {
+  const [val, setValue] = useState<string>("");
 
   const handleInput = (e: InputEvent | ClipboardEvent) => {
     const inputValue = (e.currentTarget as HTMLInputElement).value;
@@ -24,23 +18,21 @@ const Search: Component<{
   };
 
   return (
-    <div class={styles["input-wrapper"]}>
+    <div className={styles["input-wrapper"]}>
       <input
-        class={styles["input"]}
+        className={styles["input"]}
         type={props.type}
         placeholder={props.placeholder}
         maxLength={32}
-        value={val()}
+        value={val}
         onInput={(e) => handleInput(e)}
         onPaste={(e) => handleInput(e)}
       />
-      <button class={styles["input-reset"]} onClick={handleReset}>
-        <i class={styles["input-reset-icon"]}>
-          <BiRegularReset />
-        </i>
+      <button className={styles["input-reset"]} onClick={handleReset}>
+        <i className={styles["input-reset-icon"]}>{/* <BiRegularReset /> */}</i>
       </button>
     </div>
   );
-};
+}
 
 export default Search;

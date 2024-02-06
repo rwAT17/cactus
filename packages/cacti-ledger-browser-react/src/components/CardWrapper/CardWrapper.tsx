@@ -4,9 +4,9 @@ import Search from "../UI/Search/Search";
 import CustomTable from "../UI/CustomTable/CustomTable";
 // import { TableProps } from "../../schema/supabase-types";
 import Pagination from "../Pagination/Pagination";
-
+import EmptyTablePlaceholder from "../UI/CustomTable/EmptyTablePlaceholder/EmptyTablePlaceholder";
 import styles from "./CardWrapper.module.css";
-import EmptyTablePlaceholder from "";
+
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 

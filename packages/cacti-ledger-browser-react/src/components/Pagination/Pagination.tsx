@@ -1,11 +1,5 @@
 import Button from "../UI/Button/Button";
-import {
-  FaSolidAngleRight,
-  FaSolidAngleLeft,
-  FaSolidAnglesLeft,
-  FaSolidAnglesRight,
-} from "solid-icons/fa";
-import { Component, createSignal } from "solid-js";
+
 // @ts-expect-error
 import styles from "./Pagination.module.css";
 
