@@ -7,8 +7,6 @@ function Root() {
     <div className={styles.main}>
       <Menu />
       <div className={styles.content}>
-        <p>conten</p>
-
         <Outlet />
       </div>
     </div>
