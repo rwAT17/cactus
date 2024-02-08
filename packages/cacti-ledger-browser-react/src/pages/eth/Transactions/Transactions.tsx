@@ -1,14 +1,14 @@
-import { createSignal, createEffect, Show } from "solid-js";
-import { useNavigate, useParams } from "@solidjs/router";
 import { supabase } from "../../../supabase-client";
 import CardWrapper from "../../../components/CardWrapper/CardWrapper";
 import { Transaction } from "../../../schema/supabase-types";
-// @ts-expect-error
-import styles from "./Transactions.module.css";
 
-const Transactions = () => {
+import styles from "./Transactions.module.css";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+
+function Transactions() {
   const navigate = useNavigate();
-  const [transactions, setTransactions] = createSignal<Transaction[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const txnTableProps = {
     onClick: {
@@ -31,36 +31,36 @@ const Transactions = () => {
     ],
   };
 
-  const fetchTransactions = async () => {
-    try {
-      const { data } = await supabase.from("transaction").select("*");
-      if (data) {
-        console.log(JSON.stringify(data))
-        setTransactions(data);
-      } else {
-        throw new Error("Failed to load transactions");
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const { data } = await supabase.from("transaction").select("*");
+        if (data) {
+          console.log(JSON.stringify(data));
+          setTransactions(data);
+        } else {
+          throw new Error("Failed to load transactions");
+        }
+      } catch (error: any) {
+        console.error(error.message);
       }
-    } catch (error:any) {
-      console.error(error.message);
-    }
-  };
+    };
 
-  createEffect(async () => {
-    await fetchTransactions();
-  }, []);
+    fetchTransactions();
+  }, [transactions]);
 
   return (
-    <div class={styles["transactions"]}>
+    <div className={styles["transactions"]}>
       <CardWrapper
         columns={txnTableProps}
         title={"Transactions"}
         display={"All"}
-        data={transactions()}
+        data={transactions}
         filters={["id", "from", "to"]}
         trimmed={false}
       ></CardWrapper>
     </div>
   );
-};
+}
 
 export default Transactions;

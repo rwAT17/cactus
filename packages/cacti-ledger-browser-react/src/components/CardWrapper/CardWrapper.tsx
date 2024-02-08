@@ -2,7 +2,7 @@ import Button from "../UI/Button/Button";
 import Search from "../UI/Search/Search";
 
 import CustomTable from "../UI/CustomTable/CustomTable";
-// import { TableProps } from "../../schema/supabase-types";
+import { TableProps } from "../../schema/supabase-types";
 import Pagination from "../Pagination/Pagination";
 import EmptyTablePlaceholder from "../UI/CustomTable/EmptyTablePlaceholder/EmptyTablePlaceholder";
 import styles from "./CardWrapper.module.css";
@@ -102,7 +102,7 @@ function CardWrapper(props) {
         {props.trimmed && viewport === "small" && (
           <Button
             type={"primary"}
-            onClick={() => navigate(`./${props.title.toLowerCase()}`)}
+            onClick={() => navigate(`/eth/${props.title.toLowerCase()}`)}
           >
             View all
           </Button>
@@ -129,12 +129,13 @@ function CardWrapper(props) {
         {props.trimmed && viewport === "wide" && (
           <Button
             type={"primary"}
-            onClick={() => navigate(`./${props.title.toLowerCase()}`)}
+            onClick={() => navigate(`/eth/${props.title.toLowerCase()}`)}
           >
             View all
           </Button>
         )}
       </div>
+
       {!props.trimmed && (
         <Pagination
           current={currentPage}

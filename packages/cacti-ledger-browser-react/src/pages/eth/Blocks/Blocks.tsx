@@ -1,16 +1,18 @@
-import { createSignal, createEffect } from "solid-js";
-import { useNavigate } from "@solidjs/router";
+// import { createSignal, createEffect } from "solid-js";
+// import { useNavigate } from "@solidjs/router";
 import { supabase } from "../../../supabase-client";
+import { useNavigate } from "react-router-dom";
 import CardWrapper from "../../../components/CardWrapper/CardWrapper";
 import { Block } from "../../../schema/supabase-types";
 // @ts-expect-error
 import styles from "./Blocks.module.css";
+import { useEffect, useState } from "react";
 
 type ObjectKey = keyof typeof styles;
 
-const Blocks = () => {
+function Blocks() {
   const navigate = useNavigate();
-  const [block, setBlock] = createSignal<Block[]>([]);
+  const [block, setBlock] = useState<Block[]>([]);
 
   const blocksTableProps = {
     onClick: {
@@ -24,30 +26,45 @@ const Blocks = () => {
     ],
   };
 
-  const fetchBlock = async () => {
-    try {
-      const { data, error } = await supabase.from("block").select("*");
-      if (data) {
-        console.log(JSON.stringify(data))
-        setBlock(data);
-      }
-      if (error) {
+  // const fetchBlock = async () => {
+  //   try {
+  //     const { data, error } = await supabase.from("block").select("*");
+  //     if (data) {
+  //       console.log(JSON.stringify(data));
+  //       setBlock(data);
+  //     }
+  //     if (error) {
+  //       console.error(error.message);
+  //     }
+  //   } catch (error: any) {
+  //     console.error(error.message);
+  //   }
+  // };
+
+  useEffect(() => {
+    const fetchBlock = async () => {
+      try {
+        const { data, error } = await supabase.from("block").select("*");
+        if (data) {
+          console.log(JSON.stringify(data));
+          setBlock(data);
+        }
+        if (error) {
+          console.error(error.message);
+        }
+      } catch (error: any) {
         console.error(error.message);
       }
-    } catch (error:any) {
-      console.error(error.message);
-    }
-  };
+    };
 
-  createEffect(async () => {
-    await fetchBlock();
-  }, []);
+    fetchBlock();
+  }, [block]);
 
   return (
-    <div class={styles["blocks" as ObjectKey]}>
+    <div className={styles["blocks" as ObjectKey]}>
       <CardWrapper
         columns={blocksTableProps}
-        data={block()}
+        data={block}
         title={"Blocks"}
         display={"All"}
         filters={["number", "hash"]}
@@ -55,6 +72,6 @@ const Blocks = () => {
       ></CardWrapper>
     </div>
   );
-};
+}
 
 export default Blocks;

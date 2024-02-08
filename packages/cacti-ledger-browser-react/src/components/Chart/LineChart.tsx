@@ -1,12 +1,15 @@
-import { SolidApexCharts } from "solid-apexcharts";
-import { createSignal, createEffect, Component } from "solid-js";
+// import { SolidApexCharts } from "solid-apexcharts";
+// import { createSignal, createEffect, Component } from "solid-js";
+
+import Chart from "react-apexcharts";
 import moment from "moment";
 import { balanceDate } from "../../schema/supabase-types";
 // @ts-expect-error
 import styles from "./Chart.module.css";
+import { useEffect, useState } from "react";
 
-const LineChart: Component<{ chartData: any }> = (props) => {
-  const [chartProps, setChartProps] = createSignal({
+function LineChart(props) {
+  const [chartProps, setChartProps] = useState({
     series: {
       list: [
         {
@@ -25,7 +28,7 @@ const LineChart: Component<{ chartData: any }> = (props) => {
     },
   });
 
-  createEffect(async () => {
+  useEffect(() => {
     const { chartData } = props;
 
     setChartProps({
@@ -45,7 +48,7 @@ const LineChart: Component<{ chartData: any }> = (props) => {
         },
         xaxis: {
           type: "datetime",
-          categories: chartData()?.map((txn: balanceDate) =>
+          categories: chartData?.map((txn: balanceDate) =>
             moment(txn.created_at).format("YYYY-MM-DD h:mm:ss a"),
           ),
           labels: {
@@ -57,7 +60,7 @@ const LineChart: Component<{ chartData: any }> = (props) => {
         list: [
           {
             name: "balance",
-            data: chartData()?.map((txn: balanceDate) => txn.balance),
+            data: chartData?.map((txn: balanceDate) => txn.balance),
           },
         ],
       },
@@ -65,16 +68,16 @@ const LineChart: Component<{ chartData: any }> = (props) => {
   });
 
   return (
-    <div class={styles["chart-wrapper-line"]}>
-      <SolidApexCharts
+    <div className={styles["chart-wrapper-line"]}>
+      <Chart
         width="1600"
         height="250"
         type="line"
-        options={chartProps().options}
-        series={chartProps().series.list}
+        options={chartProps.options}
+        series={chartProps.series.list}
       />
     </div>
   );
-};
+}
 
 export default LineChart;

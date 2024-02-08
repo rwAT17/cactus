@@ -1,5 +1,5 @@
-import { useParams, useNavigate } from "@solidjs/router";
-import { createSignal, createEffect, Show } from "solid-js";
+// import { useParams, useNavigate } from "@solidjs/router";
+// import { createSignal, createEffect, Show } from "solid-js";
 import TokenAccount from "../../../components/TokenHeader/TokenAccount";
 import { supabase } from "../../../supabase-client";
 import CardWrapper from "../../../components/CardWrapper/CardWrapper";
@@ -7,14 +7,14 @@ import { ERC721Txn } from "../../../schema/supabase-types";
 import { TokenMetadata721 } from "../../../schema/supabase-types";
 // @ts-expect-error
 import styles from "./ERC721.module.css";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-const ERC721 = () => {
+function ERC721() {
   const params = useParams();
   const navigate = useNavigate();
-  const [token_erc721, setToken_erc721] = createSignal<ERC721Txn[]>([]);
-  const [tokenMetadata, setTokenMetadata] = createSignal<TokenMetadata721[]>(
-    [],
-  );
+  const [token_erc721, setToken_erc721] = useState<ERC721Txn[]>([]);
+  const [tokenMetadata, setTokenMetadata] = useState<TokenMetadata721[]>([]);
 
   const ercTableProps = {
     onClick: {
@@ -65,7 +65,7 @@ const ERC721 = () => {
       if (error) {
         throw new Error(error.message);
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error(error.message);
     }
   };
@@ -81,30 +81,30 @@ const ERC721 = () => {
       if (error) {
         console.error(error.message);
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error(error.message);
     }
   };
 
-  createEffect(async () => {
-    await fetchERC721();
-    await fetchMetadata();
+  useEffect(() => {
+    fetchERC721();
+    fetchMetadata();
   }, []);
 
   return (
-    <div class={styles["erc-content"]}>
+    <div className={styles["erc-content"]}>
       <CardWrapper
         columns={ercTableProps}
-        data={token_erc721()}
+        data={token_erc721}
         display={"small"}
         title={"ERC721"}
         filters={["symbol"]}
       ></CardWrapper>
-      <div class={styles["erc-wrap"]}>
+      <div className={styles["erc-wrap"]}>
         <TokenAccount accountNum={params.account} />
         <CardWrapper
           columns={metaProps}
-          data={tokenMetadata()}
+          data={tokenMetadata}
           display={"all"}
           title={"Transactions"}
           filters={["token_address", "sender", "recipient"]}
@@ -112,6 +112,6 @@ const ERC721 = () => {
       </div>
     </div>
   );
-};
+}
 
 export default ERC721;

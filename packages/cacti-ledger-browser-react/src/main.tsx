@@ -5,6 +5,16 @@ import Root from "./routes/Root.tsx";
 import Dashboard from "./pages/eth/Dashboard/Dashboard.tsx";
 
 import "./index.css";
+import Blocks from "./pages/eth/Blocks/Blocks.tsx";
+import Transactions from "./pages/eth/Transactions/Transactions.tsx";
+import Accounts from "./pages/eth/Accounts/Accounts.tsx";
+import BlockDetails from "./pages/eth/Details/BlockDetails.tsx";
+import TokenTransactionDetails from "./pages/eth/Details/TokenTransactionDetails.tsx";
+import TokenDetails from "./pages/eth/Details/TokenDetails.tsx";
+import TransactionDetails from "./pages/eth/Details/TransactionDetails.tsx";
+import ERC20 from "./pages/eth/ERC20/ERC20.tsx";
+import SingleTokenHistory from "./pages/eth/SingleTokenHistory/SingleTokenHistory.tsx";
+import ERC721 from "./pages/eth/ERC721/ERC721.tsx";
 
 const router = createBrowserRouter([
   {
@@ -21,60 +31,116 @@ const router = createBrowserRouter([
         children: [
           // MAIN
           { path: "dashboard", element: <Dashboard></Dashboard> },
-          { path: "blocks", element: <div>blocks</div> },
-          { path: "transactions", element: <div>transactions</div> },
+          {
+            path: "blocks",
+            element: (
+              <div>
+                blocks
+                <Blocks></Blocks>
+              </div>
+            ),
+          },
+          {
+            path: "transactions",
+            element: (
+              <div>
+                transactions
+                <Transactions></Transactions>
+              </div>
+            ),
+          },
           // ACCOUNTS
           {
             path: "accounts",
-            element: <div>accounts</div>,
+            element: <Outlet></Outlet>,
             children: [
               {
                 path: ":standard",
-                element: <div>eth/accounts/:standard path</div>,
+                element: (
+                  <div>
+                    eth/accounts/:standard path
+                    <Accounts></Accounts>
+                  </div>
+                ),
               },
             ],
           },
           //BLOCK
           {
             path: "block-details",
-            element: <div>block-details</div>,
+            element: <Outlet></Outlet>,
             children: [
               {
                 path: ":number",
-                element: <div>eth/block-detail/:number path</div>,
+                element: (
+                  <div>
+                    eth/block-detail/:number path
+                    <BlockDetails></BlockDetails>
+                  </div>
+                ),
               },
             ],
           },
           // TOKEN TRANSACTION DETAILS
           {
             path: "token-txn-details",
-            element: <div>token-txn-details</div>,
+            element: (
+              <div>
+                token-txn-details
+                <Outlet></Outlet>
+              </div>
+            ),
             children: [
               {
-                path: ":address",
-                element: <div>eth/token-txn-details/:address path</div>,
+                path: ":standard/:address",
+                element: (
+                  <div>
+                    eth/token-txn-details/:standard/:address path
+                    <TokenTransactionDetails></TokenTransactionDetails>
+                  </div>
+                ),
               },
             ],
           },
           // TOKEN DETAILS
           {
             path: "token-detail",
-            element: <div>token-detail</div>,
+            element: (
+              <div>
+                token-detail
+                <Outlet></Outlet>
+              </div>
+            ),
             children: [
               {
-                path: ":address",
-                element: <div>eth/token-detail/:address path</div>,
+                path: ":standard/:address",
+                element: (
+                  <div>
+                    eth/token-detail/:standard/:address path
+                    <TokenDetails></TokenDetails>
+                  </div>
+                ),
               },
             ],
           },
           // TRANSACTION DETAILS
           {
             path: "txn-detail",
-            element: <div>txn-detail</div>,
+            element: (
+              <div>
+                txn-detail
+                <Outlet></Outlet>
+              </div>
+            ),
             children: [
               {
                 path: ":id",
-                element: <div>eth/txn-detail/:id path</div>,
+                element: (
+                  <div>
+                    eth/txn-detail/:id path
+                    <TransactionDetails></TransactionDetails>
+                  </div>
+                ),
               },
             ],
           },
@@ -87,10 +153,23 @@ const router = createBrowserRouter([
               </div>
             ),
             children: [
-              { path: ":account", element: <div>eth/erc20/:account path</div> },
+              {
+                path: ":account",
+                element: (
+                  <div>
+                    eth/erc20/:account path
+                    <ERC20></ERC20>
+                  </div>
+                ),
+              },
               {
                 path: "trend/:account/:address",
-                element: <div>trend/:account/:address path</div>,
+                element: (
+                  <div>
+                    trend/:account/:address path
+                    <SingleTokenHistory></SingleTokenHistory>
+                  </div>
+                ),
               },
             ],
           },
@@ -104,7 +183,12 @@ const router = createBrowserRouter([
             children: [
               {
                 path: ":account",
-                element: <div>eth/erc721/:account path</div>,
+                element: (
+                  <div>
+                    eth/erc721/:account path
+                    <ERC721></ERC721>
+                  </div>
+                ),
               },
             ],
           },

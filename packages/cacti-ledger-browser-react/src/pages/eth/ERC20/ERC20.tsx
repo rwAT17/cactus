@@ -1,5 +1,3 @@
-import { useParams, useNavigate } from "@solidjs/router";
-import { createSignal, createEffect } from "solid-js";
 import TokenAccount from "../../../components/TokenHeader/TokenAccount";
 import { supabase } from "../../../supabase-client";
 import CardWrapper from "../../../components/CardWrapper/CardWrapper";
@@ -7,11 +5,13 @@ import Chart from "../../../components/Chart/Chart";
 import { ERC20Txn } from "../../../schema/supabase-types";
 // @ts-expect-error
 import styles from "./ERC20.module.css";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const ERC20 = () => {
   const params = useParams();
   const navigate = useNavigate();
-  const [token_erc20, setToken_erc20] = createSignal<ERC20Txn[]>([]);
+  const [token_erc20, setToken_erc20] = useState<ERC20Txn[]>([]);
 
   const ercTableProps = {
     onClick: {
@@ -48,24 +48,23 @@ const ERC20 = () => {
     }
   };
 
-  createEffect(async () => {
-    await fetchERC20();
+  useEffect(() => {
+    fetchERC20();
   }, []);
 
   return (
-    <div class={styles["erc-content"]}>
-            <div class={styles["erc-wrap"]}>
-            <TokenAccount accountNum={params.account} />
-      <CardWrapper
-        columns={ercTableProps}
-        data={token_erc20()}
-        display={"wide"}
-        title={"ERC20"}
-        filters={["token_address"]}
-      />
+    <div className={styles["erc-content"]}>
+      <div className={styles["erc-wrap"]}>
+        <TokenAccount accountNum={params.account} />
+        <CardWrapper
+          columns={ercTableProps}
+          data={token_erc20}
+          display={"wide"}
+          title={"ERC20"}
+          filters={["token_address"]}
+        />
       </div>
-      <div class={styles["erc-wrap"]}>
-
+      <div className={styles["erc-wrap"]}>
         <Chart chartData={token_erc20} />
       </div>
     </div>

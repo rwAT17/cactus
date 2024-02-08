@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Button from "../UI/Button/Button";
 
 // @ts-expect-error
@@ -11,19 +12,19 @@ type pagination = {
   goPrevPage: () => void;
 };
 
-const Pagination: Component<pagination> = (props) => {
+function Pagination(props) {
   let inputRef: any;
   const getInputValue = () =>
     inputRef?.value ? inputRef.value : props.current;
-  const [goToPageVisible, setGoToPageVisible] = createSignal<boolean>(false);
+  const [goToPageVisible, setGoToPageVisible] = useState<boolean>(false);
 
   return (
-    <div class={styles.pagination}>
+    <div className={styles.pagination}>
       <Button onClick={() => props.goToPage(1)}>
-        <FaSolidAnglesLeft />
+        {/* <FaSolidAnglesLeft /> */}
       </Button>
       <Button onClick={() => props.goPrevPage()}>
-        <FaSolidAngleLeft />
+        {/* <FaSolidAngleLeft /> */}
       </Button>
       <Button onClick={() => setGoToPageVisible((prev) => !prev)}>
         {" "}
@@ -31,8 +32,8 @@ const Pagination: Component<pagination> = (props) => {
           {props.current} / {props.total}
         </span>
       </Button>
-      {goToPageVisible() === true && (
-        <div class={styles["pagination-jump"]}>
+      {goToPageVisible === true && (
+        <div className={styles["pagination-jump"]}>
           <input
             ref={inputRef}
             id="number"
@@ -48,13 +49,13 @@ const Pagination: Component<pagination> = (props) => {
         </div>
       )}
       <Button onClick={() => props.goNextPage()}>
-        <FaSolidAngleRight />
+        {/* <FaSolidAngleRight /> */}
       </Button>
       <Button onClick={() => props.goToPage(props.total)}>
-        <FaSolidAnglesRight />
+        {/* <FaSolidAnglesRight /> */}
       </Button>
     </div>
   );
-};
+}
 
 export default Pagination;

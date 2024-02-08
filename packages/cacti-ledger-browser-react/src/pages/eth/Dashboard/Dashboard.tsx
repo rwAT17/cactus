@@ -25,6 +25,7 @@ function Dashboard() {
       { display: "token value", objProp: ["eth_value"] },
     ],
   };
+
   const blocksTableProps = {
     onClick: {
       action: (param: string) => {

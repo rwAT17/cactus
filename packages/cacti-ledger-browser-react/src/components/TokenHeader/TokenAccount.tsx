@@ -1,20 +1,20 @@
-import { BiRegularWallet } from "solid-icons/bi";
-import { Component } from "solid-js";
+// import { BiRegularWallet } from "solid-icons/bi";
+// import { Component } from "solid-js";
 // @ts-expect-error
 import styles from "./TokenHeader.module.css";
 
-const TokenAccount: Component<{ accountNum: string }> = (props) => {
+function TokenAccount(props) {
   return (
-    <div class={styles["token-account"]}>
+    <div className={styles["token-account"]}>
       <span>
         {" "}
-        <span class={styles["token-account-icon"]}>
-          <BiRegularWallet />
+        <span className={styles["token-account-icon"]}>
+          {/* <BiRegularWallet /> */}
         </span>{" "}
         {props.accountNum}
       </span>
     </div>
   );
-};
+}
 
 export default TokenAccount;

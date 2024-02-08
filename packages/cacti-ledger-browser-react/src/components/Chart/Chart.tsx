@@ -1,11 +1,14 @@
-import { SolidApexCharts } from "solid-apexcharts";
-import { createSignal, createEffect, Component } from "solid-js";
+// import { SolidApexCharts } from "solid-apexcharts";
+
+import Chart from "react-apexcharts";
+// import { createSignal, createEffect, Component } from "solid-js";
+import { useEffect, useState } from "react";
 import { ERC20Txn } from "../../schema/supabase-types";
-// @ts-expect-error
+
 import styles from "./Chart.module.css";
 
-const Chart: Component<{ chartData: any }> = (props) => {
-  const [chartProps, setChartProps] = createSignal<{
+function ApexChart(props) {
+  const [chartProps, setChartProps] = useState<{
     series: any;
     options: any;
   }>({
@@ -27,7 +30,7 @@ const Chart: Component<{ chartData: any }> = (props) => {
     },
   });
 
-  createEffect(async () => {
+  useEffect(() => {
     const { chartData } = props;
 
     setChartProps({
@@ -36,14 +39,14 @@ const Chart: Component<{ chartData: any }> = (props) => {
           id: "solidchart-example",
         },
         xaxis: {
-          categories: chartData()?.map((txn: ERC20Txn) => txn.token_address),
+          categories: chartData?.map((txn: ERC20Txn) => txn.token_address),
         },
       },
       series: {
         list: [
           {
             name: "balance",
-            data: chartData()?.map((txn: ERC20Txn) => txn.balance),
+            data: chartData?.map((txn: ERC20Txn) => txn.balance),
           },
         ],
       },
@@ -51,16 +54,16 @@ const Chart: Component<{ chartData: any }> = (props) => {
   });
 
   return (
-    <div class={styles["chart-wrapper"]}>
+    <div className={styles["chart-wrapper"]}>
       <span>Balance</span>
-      <SolidApexCharts 
+      <Chart
         width={650}
         type="bar"
-        options={chartProps().options}
-        series={chartProps().series.list}
+        options={chartProps.options}
+        series={chartProps.series.list}
       />
     </div>
   );
-};
+}
 
-export default Chart;
+export default ApexChart;

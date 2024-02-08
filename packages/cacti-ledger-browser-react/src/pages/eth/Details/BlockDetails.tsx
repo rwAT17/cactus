@@ -1,17 +1,17 @@
-import { createEffect, createSignal, Show } from "solid-js";
-import { useParams } from "@solidjs/router";
 import { supabase } from "../../../supabase-client";
 import { Block } from "../../../schema/supabase-types";
-// @ts-expect-error
-import styles from "./Details.module.css";
 
-const blockDetails = () => {
-  const [details, setDetails] = createSignal<Block | any>({});
+import styles from "./Details.module.css";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+
+function BlockDetails() {
+  const [details, setDetails] = useState<Block | any>();
   const params = useParams();
 
-  createEffect(async () => {
+  const fethcData = async () => {
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("block")
         .select("*")
         .match({ number: params.number });
@@ -20,40 +20,48 @@ const blockDetails = () => {
       } else {
         throw new Error("Failed to load block details");
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error(error.message);
     }
+  };
+
+  useEffect(() => {
+    fethcData;
   }, []);
 
   return (
     <div>
-      <div class={styles["details-card"]}>
-        <Show when={details} fallback={<div>Failed to load details</div>}>
-          <h1>Block Details</h1>
-          <p>
-            <b> Address:</b> {details().number}{" "}
-          </p>
-          <p>
-            {" "}
-            <b>Created at: </b>
-            {details().created_at}
-          </p>
-          <p>
-            <b>Hash: </b>
-            {details().hash}
-          </p>
-          <p>
-            <b>Number of transaction: </b>
-            {details().number_of_tx}
-          </p>
-          <p>
-            <b>Sync at: </b>
-            {details().sync_at}
-          </p>
-        </Show>
+      <div className={styles["details-card"]}>
+        {details ? (
+          <>
+            <h1>Block Details</h1>
+            <p>
+              <b> Address:</b> {details.number}{" "}
+            </p>
+            <p>
+              {" "}
+              <b>Created at: </b>
+              {details.created_at}
+            </p>
+            <p>
+              <b>Hash: </b>
+              {details.hash}
+            </p>
+            <p>
+              <b>Number of transaction: </b>
+              {details.number_of_tx}
+            </p>
+            <p>
+              <b>Sync at: </b>
+              {details.sync_at}
+            </p>
+          </>
+        ) : (
+          <div>Failed to load details</div>
+        )}
       </div>
     </div>
   );
-};
+}
 
-export default blockDetails;
+export default BlockDetails;

@@ -1,19 +1,18 @@
-import TokenAccount from './TokenAccount'
-import { Component } from 'solid-js'
-import { createSignal, createEffect } from 'solid-js'
-import { TokenMetadata20 } from '../../schema/supabase-types'
-import { supabase } from '../../supabase-client'
-// @ts-expect-error
+import TokenAccount from "./TokenAccount";
+// import { Component } from 'solid-js'
+// import { createSignal, createEffect } from 'solid-js'
+import { TokenMetadata20 } from "../../schema/supabase-types";
+import { supabase } from "../../supabase-client";
+// @ts-expect-erro
 import styles from "./TokenHeader.module.css";
+import { useEffect, useState } from "react";
 
-const TokenHeader: Component<{ accountNum: string; token_address: string }> = (
-  props,
-) => {
-  const [tokenData, setTokenData] = createSignal<TokenMetadata20 | any>();
+function TokenHeader(props) {
+  const [tokenData, setTokenData] = useState<TokenMetadata20 | any>();
 
-  createEffect(async () => {
+  const fetchData = async () => {
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from(`token_metadata_erc20`)
         .select("*")
         .match({ address: props.token_address });
@@ -26,27 +25,29 @@ const TokenHeader: Component<{ accountNum: string; token_address: string }> = (
     } catch (error: any) {
       console.error(error.message);
     }
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   return (
-    <div class={styles["token-header"]}>
-            <TokenAccount accountNum={props.accountNum} />
-      <div class={styles["token-details"]}>
+    <div className={styles["token-header"]}>
+      <TokenAccount accountNum={props.accountNum} />
+      <div className={styles["token-details"]}>
         <p>
           <b>Address:</b> {props.token_address}
         </p>
         <p>
-          <b>Created at:</b> {tokenData()?.created_at}
+          <b>Created at:</b> {tokenData?.created_at}
         </p>
         <p>
           <b>Total supply: </b>
-          {tokenData()?.total_supply}
+          {tokenData?.total_supply}
         </p>
       </div>
     </div>
   );
-};
+}
 
 export default TokenHeader;
-
-

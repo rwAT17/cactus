@@ -1,19 +1,19 @@
-import { createEffect, createSignal } from "solid-js";
-import { useParams } from "@solidjs/router";
 import { supabase } from "../../../supabase-client";
 import { STANDARDS } from "../../../schema/token-standards";
 import { ERC20Txn, ERC721Txn } from "../../../schema/supabase-types";
-// @ts-expect-error
+
 import styles from "./Details.module.css";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 const TokenTransactionDetails = () => {
-  const [txnData, setTxnData] = createSignal<ERC20Txn | ERC721Txn | any>({});
+  const [txnData, setTxnData] = useState<ERC20Txn | ERC721Txn | any>({});
   const params = useParams();
 
-  createEffect(async () => {
+  const fethcData = async () => {
     try {
-      const { data, error } = await supabase
-        .from(`token_${params.standard.toLowerCase()}`)
+      const { data } = await supabase
+        .from(`token_${params.standard?.toLowerCase()}`)
         .select("*")
         .match({ account_address: params.address });
       if (data?.[0]) {
@@ -21,24 +21,28 @@ const TokenTransactionDetails = () => {
       } else {
         throw new Error("Failed to load transaction details");
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error(error.message);
     }
+  };
+
+  useEffect(() => {
+    fethcData();
   }, []);
 
   return (
-    <div class={styles["details"]}>
-      <div class={styles["details-card"]}>
+    <div className={styles["details"]}>
+      <div className={styles["details-card"]}>
         <h1>Details of Transaction</h1>
         <p>
           {" "}
           <b>Address: </b>
-          {txnData()?.account_address}{" "}
+          {txnData?.account_address}{" "}
         </p>
         <p>
           {" "}
           <b>Created_at: </b>
-          {txnData()?.token_address}
+          {txnData?.token_address}
         </p>
         {params.standard === STANDARDS.erc20 && (
           <p>
