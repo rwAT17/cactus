@@ -18,7 +18,7 @@ const Button: ParentComponent<{
   return (
     <button
       onClick={handleClick}
-      class={styles.button + " " + styles[buttonTypeStyle]}
+      className={styles.button + " " + styles[buttonTypeStyle]}
     >
       {props.children}
     </button>

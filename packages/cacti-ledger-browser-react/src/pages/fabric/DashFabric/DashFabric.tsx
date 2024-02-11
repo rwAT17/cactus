@@ -1,16 +1,16 @@
-import { createSignal, createEffect, Show } from "solid-js";
-import { useNavigate, useParams } from "@solidjs/router";
 import { supabase } from "../../../supabase-client";
 import CardWrapper from "../../../components/CardWrapper/CardWrapper";
 import { Transaction } from "../../../schema/supabase-types";
 import { Block } from "../../../schema/supabase-types";
 // @ts-expect-error
 import styles from "./DashFabric.module.css";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-const DashFabric = () => {
+function DashFabric() {
   const navigate = useNavigate();
-  const [transaction, setTransaction] = createSignal<Transaction[]>([]);
-  const [block, setBlock] = createSignal<Block[]>([]);
+  const [transaction, setTransaction] = useState<Transaction[]>([]);
+  const [block, setBlock] = useState<Block[]>([]);
 
   const txnTableProps = {
     onClick: {
@@ -46,14 +46,16 @@ const DashFabric = () => {
 
   const fetchTransactions = async () => {
     try {
-      const { data, error } = await supabase.from("fabric_transactions").select("*");
+      const { data, error } = await supabase
+        .from("fabric_transactions")
+        .select("*");
       if (data) {
         setTransaction(data);
       }
       if (error) {
         console.error(error.message);
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error(error.message);
     }
   };
@@ -67,36 +69,36 @@ const DashFabric = () => {
       if (error) {
         console.error(error.message);
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error(error.message);
     }
   };
 
-  createEffect(async () => {
-    await fetchBlock();
-    await fetchTransactions();
+  useEffect(() => {
+    fetchBlock();
+    fetchTransactions();
   }, []);
 
   return (
     <div>
-      <div class={styles["dashboard-wrapper"]}>
+      <div className={styles["dashboard-wrapper"]}>
         <CardWrapper
           columns={txnTableProps}
           title="Transactions"
           display="wide"
           trimmed={true}
-          data={transaction()}
+          data={transaction}
         ></CardWrapper>
         <CardWrapper
           columns={blocksTableProps}
           title="Blocks"
           display="wide"
           trimmed={true}
-          data={block()}
+          data={block}
         ></CardWrapper>
       </div>
     </div>
   );
 }
 
-export default DashFabric
+export default DashFabric;

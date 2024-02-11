@@ -1,16 +1,16 @@
-import { createSignal, createEffect } from "solid-js";
-import { useNavigate } from "@solidjs/router";
 import { supabase } from "../../../supabase-client";
 import CardWrapper from "../../../components/CardWrapper/CardWrapper";
 import { Block } from "../../../schema/supabase-types";
 // @ts-expect-error
 import styles from "./BlocksFabric.module.css";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 type ObjectKey = keyof typeof styles;
 
 const BlocksFabric = () => {
   const navigate = useNavigate();
-  const [block, setBlock] = createSignal<Block[]>([]);
+  const [block, setBlock] = useState<Block[]>([]);
 
   const blocksTableProps = {
     onClick: {
@@ -37,20 +37,20 @@ const BlocksFabric = () => {
       if (error) {
         console.error(error.message);
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error(error.message);
     }
   };
 
-  createEffect(async () => {
-    await fetchBlock();
+  useEffect(() => {
+    fetchBlock();
   }, []);
 
   return (
-    <div class={styles["blocks" as ObjectKey]}>
+    <div className={styles["blocks" as ObjectKey]}>
       <CardWrapper
         columns={blocksTableProps}
-        data={block()}
+        data={block}
         title={"Blocks"}
         display={"All"}
         filters={["block_number", "data_hash"]}

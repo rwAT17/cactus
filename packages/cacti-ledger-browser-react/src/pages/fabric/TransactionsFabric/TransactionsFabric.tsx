@@ -1,21 +1,21 @@
-import { createSignal, createEffect, Show } from "solid-js";
-import { useNavigate, useParams } from "@solidjs/router";
 import { supabase } from "../../../supabase-client";
 import CardWrapper from "../../../components/CardWrapper/CardWrapper";
 import { Transaction } from "../../../schema/supabase-types";
 // @ts-expect-error
 import styles from "./TransactionsFabric.module.css";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const TransactionsFabric = () => {
+function TransactionsFabric() {
   const navigate = useNavigate();
-  const [transactions, setTransactions] = createSignal<Transaction[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const txnTableProps = {
     onClick: {
       action: (param: string) => {
         navigate(`/fabric/txn-details/${param}`);
       },
-      prop:"id",
+      prop: "id",
     },
     schema: [
       { display: "created at", objProp: ["created_at"] },
@@ -34,27 +34,27 @@ const TransactionsFabric = () => {
       } else {
         throw new Error("Failed to load transactions");
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error(error.message);
     }
   };
 
-  createEffect(async () => {
-    await fetchTransactions();
+  useEffect(() => {
+    fetchTransactions();
   }, []);
 
   return (
-    <div class={styles["transactions"]}>
+    <div className={styles["transactions"]}>
       <CardWrapper
         columns={txnTableProps}
         title={"Transactions"}
         display={"All"}
-        data={transactions()}
+        data={transactions}
         filters={["transaction_id", "block_id"]}
         trimmed={false}
       ></CardWrapper>
     </div>
   );
-};
+}
 
 export default TransactionsFabric;

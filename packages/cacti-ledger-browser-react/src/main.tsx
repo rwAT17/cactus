@@ -15,6 +15,11 @@ import TransactionDetails from "./pages/eth/Details/TransactionDetails.tsx";
 import ERC20 from "./pages/eth/ERC20/ERC20.tsx";
 import SingleTokenHistory from "./pages/eth/SingleTokenHistory/SingleTokenHistory.tsx";
 import ERC721 from "./pages/eth/ERC721/ERC721.tsx";
+import TransactionsFabric from "./pages/fabric/TransactionsFabric/TransactionsFabric.tsx";
+import DashFabric from "./pages/fabric/DashFabric/DashFabric.tsx";
+import BlocksFabric from "./pages/fabric/BlocksFabric/BlocksFabric.tsx";
+import FabricTransaction from "./pages/fabric/FabricTransaction/FabricTransaction.tsx";
+import FabricBlock from "./pages/fabric/FabricBlock/FabricBlock.tsx";
 
 const router = createBrowserRouter([
   {
@@ -199,14 +204,32 @@ const router = createBrowserRouter([
         path: "fabric",
         element: <Outlet></Outlet>,
         children: [
-          { path: "dashboard", element: <p>Dashboard</p> },
+          {
+            path: "dashboard",
+            element: (
+              <div>
+                <p>/dashboard</p>
+                <DashFabric></DashFabric>
+              </div>
+            ),
+          },
           {
             path: "transactions",
-            element: <div>transactions</div>,
+            element: (
+              <div>
+                transactions
+                <TransactionsFabric></TransactionsFabric>
+              </div>
+            ),
           },
           {
             path: "blocks",
-            element: <div>blocks</div>,
+            element: (
+              <div>
+                blocks
+                <BlocksFabric></BlocksFabric>
+              </div>
+            ),
           },
           {
             path: "txn-details",
@@ -215,7 +238,17 @@ const router = createBrowserRouter([
                 <Outlet></Outlet>
               </div>
             ),
-            children: [{ path: ":id", element: <div>txn-details/:id</div> }],
+            children: [
+              {
+                path: ":id",
+                element: (
+                  <div>
+                    txn-details/:id
+                    <FabricTransaction></FabricTransaction>
+                  </div>
+                ),
+              },
+            ],
           },
           {
             path: "block-details",
@@ -224,7 +257,17 @@ const router = createBrowserRouter([
                 <Outlet></Outlet>
               </div>
             ),
-            children: [{ path: ":id", element: <div>txn-details/:id</div> }],
+            children: [
+              {
+                path: ":id",
+                element: (
+                  <div>
+                    block-details/:id
+                    <FabricBlock></FabricBlock>
+                  </div>
+                ),
+              },
+            ],
           },
         ],
       },
