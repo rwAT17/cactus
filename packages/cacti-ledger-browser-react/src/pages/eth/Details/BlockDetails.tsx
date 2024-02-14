@@ -26,7 +26,7 @@ function BlockDetails() {
   };
 
   useEffect(() => {
-    fethcData;
+    fethcData();
   }, []);
 
   return (

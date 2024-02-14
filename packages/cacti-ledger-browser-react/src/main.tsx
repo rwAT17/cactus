@@ -130,7 +130,7 @@ const router = createBrowserRouter([
           },
           // TRANSACTION DETAILS
           {
-            path: "txn-detail",
+            path: "txn-details",
             element: (
               <div>
                 txn-detail

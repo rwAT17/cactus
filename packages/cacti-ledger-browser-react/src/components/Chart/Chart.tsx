@@ -8,59 +8,31 @@ import { ERC20Txn } from "../../schema/supabase-types";
 import styles from "./Chart.module.css";
 
 function ApexChart(props) {
-  const [chartProps, setChartProps] = useState<{
-    series: any;
-    options: any;
-  }>({
-    series: {
-      list: [
-        {
-          name: "balance",
-          data: [],
-        },
-      ],
-    },
+  const chartProps = {
     options: {
       chart: {
         id: "solidchart-example",
       },
       xaxis: {
-        type: "datetime",
+        categories: props.chartData?.map((txn: ERC20Txn) => txn.token_address),
       },
     },
-  });
-
-  useEffect(() => {
-    const { chartData } = props;
-
-    setChartProps({
-      options: {
-        chart: {
-          id: "solidchart-example",
-        },
-        xaxis: {
-          categories: chartData?.map((txn: ERC20Txn) => txn.token_address),
-        },
+    series: [
+      {
+        name: "balance",
+        data: props.chartData?.map((txn: ERC20Txn) => txn.balance),
       },
-      series: {
-        list: [
-          {
-            name: "balance",
-            data: chartData?.map((txn: ERC20Txn) => txn.balance),
-          },
-        ],
-      },
-    });
-  });
+    ],
+  };
 
+  console.log(chartProps.options);
   return (
     <div className={styles["chart-wrapper"]}>
-      <span>Balance</span>
       <Chart
-        width={650}
+        width="650"
         type="bar"
         options={chartProps.options}
-        series={chartProps.series.list}
+        series={chartProps.series}
       />
     </div>
   );

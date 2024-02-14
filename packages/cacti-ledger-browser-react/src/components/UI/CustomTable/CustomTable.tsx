@@ -3,11 +3,12 @@ import { TableProps, TableProperty } from "../../../schema/supabase-types";
 import EmptyTablePlaceholder from "./EmptyTablePlaceholder/EmptyTablePlaceholder";
 // @ts-expect-error
 import styles from "./CustomTable.module.css";
+import { useEffect, useState } from "react";
 
 function CustomTable(props) {
-  const [viewport, setViewport] = createSignal("");
+  const [viewport, setViewport] = useState("");
 
-  createEffect(() => {
+  useEffect(() => {
     const screenResized = () =>
       setViewport(window.innerWidth <= 1699 ? "small" : "wide");
     screenResized();
@@ -39,7 +40,7 @@ function CustomTable(props) {
         <EmptyTablePlaceholder />
       ) : (
         <>
-          {viewport() === "wide" && (
+          {viewport === "wide" && (
             <table>
               <thead>
                 <tr>
@@ -64,7 +65,7 @@ function CustomTable(props) {
             </table>
           )}
 
-          {viewport() === "small" && (
+          {viewport === "small" && (
             <>
               {props.data.map((row) => {
                 return (

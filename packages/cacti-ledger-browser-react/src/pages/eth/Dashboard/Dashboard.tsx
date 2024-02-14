@@ -1,11 +1,12 @@
 // import { supabase } from "../../../supabase-client";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CardWrapper from "../../../components/CardWrapper/CardWrapper";
 // import { Transaction } from "../../../schema/supabase-types";
 // import { Block } from "../../../schema/supabase-types";
 
 import styles from "./Dashboard.module.css";
+import { supabase } from "../../../supabase-client";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -39,6 +40,38 @@ function Dashboard() {
       { display: "hash", objProp: ["hash"] },
     ],
   };
+  const fetchTransactions = async () => {
+    try {
+      const { data, error } = await supabase.from("transaction").select("*");
+      if (data) {
+        setTransaction(data);
+      }
+      if (error) {
+        console.error(error.message);
+      }
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
+
+  const fetchBlock = async () => {
+    try {
+      const { data, error } = await supabase.from("block").select("*");
+      if (data) {
+        setBlock(data);
+      }
+      if (error) {
+        console.error(error.message);
+      }
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchTransactions();
+    fetchBlock();
+  }, []);
 
   return (
     <div>
