@@ -15,7 +15,6 @@ const pageSize: number = 6;
 function CardWrapper(props) {
   const location = useLocation();
   const path = location.pathname.split("/");
-
   const navigate = useNavigate();
   const [searchKey, setSearchKey] = useState("");
   let filteredData = props.data;
@@ -72,7 +71,7 @@ function CardWrapper(props) {
     return () => {
       window.removeEventListener("resize", screenResized, true);
     };
-  }, [paginatedData, viewport]);
+  }, []);
 
   useEffect(() => {
     if (filteredData.length <= pageSize) {
@@ -81,13 +80,12 @@ function CardWrapper(props) {
       const firstEl = currentPage * pageSize - pageSize;
       setPaginatedData(filteredData.slice(firstEl, firstEl + pageSize));
     }
-  }, [currentPage, filteredData, filteredData.length, paginatedData]);
+  }, [currentPage, filteredData]);
 
   useEffect(() => {
     const pageNum = Math.ceil(filteredData.length / pageSize);
     setTotalPages(pageNum);
-  }, [totalPages, filteredData.length]);
-  console.warn("RENDER");
+  }, [filteredData]);
 
   return (
     <section

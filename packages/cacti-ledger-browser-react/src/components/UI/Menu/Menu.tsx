@@ -13,7 +13,7 @@ import Button from "../Button/Button";
 
 const ledgersPaths = {
   eth: [
-    { title: "DASHBOARD", path: "/eth/dashboard", },
+    { title: "DASHBOARD", path: "/eth/dashboard" },
     { title: "ERC20", path: "/eth/accounts/erc20" },
     { title: "NFT ERC721", path: "/eth/accounts/erc721" },
   ],
@@ -31,7 +31,7 @@ function Menu() {
     navigate(`/${selectedValue}`);
   };
 
-  useEffect(() => {
+  const updateLedgers = () => {
     if (activeLedger.length > 0) return;
     const currentPath = location.pathname;
     const ledgers = ["eth", "fabric"];
@@ -41,6 +41,10 @@ function Menu() {
         setActiveLedger(ledger);
       }
     });
+  };
+
+  useEffect(() => {
+    updateLedgers();
   });
 
   function activeLedgerItems(ledger: any) {
@@ -51,7 +55,6 @@ function Menu() {
         </Button>
       );
     });
-
     return items;
   }
 

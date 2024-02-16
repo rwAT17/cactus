@@ -31,24 +31,24 @@ function Transactions() {
     ],
   };
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const { data } = await supabase.from("transaction").select("*");
-        if (data) {
-          console.log(JSON.stringify(data));
-          setTransactions(data);
-        } else {
-          throw new Error("Failed to load transactions");
-        }
-      } catch (error: any) {
-        console.error(error.message);
+  const fetchTransactions = async () => {
+    try {
+      const { data } = await supabase.from("transaction").select("*");
+      if (data) {
+        console.log(JSON.stringify(data));
+        setTransactions(data);
+      } else {
+        throw new Error("Failed to load transactions");
       }
-    };
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
 
+  useEffect(() => {
     fetchTransactions();
-  }, [transactions]);
-
+  }, []);
+  console.warn("render");
   return (
     <div className={styles["transactions"]}>
       <CardWrapper

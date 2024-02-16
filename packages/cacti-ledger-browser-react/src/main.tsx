@@ -89,7 +89,6 @@ const router = createBrowserRouter([
             path: "token-txn-details",
             element: (
               <div>
-                token-txn-details
                 <Outlet></Outlet>
               </div>
             ),
@@ -109,7 +108,6 @@ const router = createBrowserRouter([
             path: "token-detail",
             element: (
               <div>
-                token-detail
                 <Outlet></Outlet>
               </div>
             ),
@@ -231,7 +229,6 @@ const router = createBrowserRouter([
                 path: ":id",
                 element: (
                   <div>
-             
                     <FabricTransaction></FabricTransaction>
                   </div>
                 ),

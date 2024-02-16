@@ -26,39 +26,24 @@ function Blocks() {
     ],
   };
 
-  // const fetchBlock = async () => {
-  //   try {
-  //     const { data, error } = await supabase.from("block").select("*");
-  //     if (data) {
-  //       console.log(JSON.stringify(data));
-  //       setBlock(data);
-  //     }
-  //     if (error) {
-  //       console.error(error.message);
-  //     }
-  //   } catch (error: any) {
-  //     console.error(error.message);
-  //   }
-  // };
-
-  useEffect(() => {
-    const fetchBlock = async () => {
-      try {
-        const { data, error } = await supabase.from("block").select("*");
-        if (data) {
-          console.log(JSON.stringify(data));
-          setBlock(data);
-        }
-        if (error) {
-          console.error(error.message);
-        }
-      } catch (error: any) {
+  const fetchBlock = async () => {
+    try {
+      const { data, error } = await supabase.from("block").select("*");
+      if (data) {
+        console.log(JSON.stringify(data));
+        setBlock(data);
+      }
+      if (error) {
         console.error(error.message);
       }
-    };
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
 
+  useEffect(() => {
     fetchBlock();
-  }, [block]);
+  }, []);
 
   return (
     <div className={styles["blocks" as ObjectKey]}>
