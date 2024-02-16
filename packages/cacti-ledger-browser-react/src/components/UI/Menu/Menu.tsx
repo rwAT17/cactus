@@ -13,11 +13,11 @@ import Button from "../Button/Button";
 
 const ledgersPaths = {
   eth: [
-    { title: "DASHBOARD", path: "/eth/dashboard" },
+    { title: "DASHBOARD", path: "/eth/dashboard", },
     { title: "ERC20", path: "/eth/accounts/erc20" },
     { title: "NFT ERC721", path: "/eth/accounts/erc721" },
   ],
-  fabric: [{ title: "DASHBOARD", path: "/fabric/dashboard" }],
+  fabric: [{ title: "DASHBOARD", path: "/fabric/dashboard", basePath: "/eth" }],
 };
 
 function Menu() {
@@ -60,7 +60,6 @@ function Menu() {
       <Select
         value={activeLedger}
         onSelect={(val: string) => {
-          // console.log("xddd");
           handleSelect(val);
         }}
       />

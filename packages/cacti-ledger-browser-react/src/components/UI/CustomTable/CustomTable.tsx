@@ -4,8 +4,11 @@ import EmptyTablePlaceholder from "./EmptyTablePlaceholder/EmptyTablePlaceholder
 // @ts-expect-error
 import styles from "./CustomTable.module.css";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 function CustomTable(props) {
+
+
   const [viewport, setViewport] = useState("");
 
   useEffect(() => {
@@ -16,7 +19,7 @@ function CustomTable(props) {
     return () => {
       window.removeEventListener("resize", screenResized, true);
     };
-  });
+  }, [viewport]);
 
   const getObjPropVal = (objProp: string[], row: any) => {
     if (objProp.length === 1) return row[objProp[0]];
@@ -70,14 +73,14 @@ function CustomTable(props) {
               {props.data.map((row) => {
                 return (
                   <table
-                    class={styles["table-rwd"]}
+                    className={styles["table-rwd"]}
                     onClick={() => handleRowClick(row)}
                   >
                     <tbody>
                       {props.cols.schema.map((heading, idx) => {
                         return (
                           <tr>
-                            <td class={styles["table-rwd-heading"]}>
+                            <td className={styles["table-rwd-heading"]}>
                               {heading.display}
                             </td>
                             <td>

@@ -51,7 +51,7 @@ const ERC20 = () => {
   useEffect(() => {
     fetchERC20();
   }, []);
-  console.log("token_erc20", token_erc20);
+
   return (
     <div className={styles["erc-content"]}>
       <div className={styles["erc-wrap"]}>

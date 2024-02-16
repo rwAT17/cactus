@@ -63,7 +63,6 @@ const router = createBrowserRouter([
                 path: ":standard",
                 element: (
                   <div>
-                    eth/accounts/:standard path
                     <Accounts></Accounts>
                   </div>
                 ),
@@ -79,7 +78,6 @@ const router = createBrowserRouter([
                 path: ":number",
                 element: (
                   <div>
-                    eth/block-detail/:number path
                     <BlockDetails></BlockDetails>
                   </div>
                 ),
@@ -100,7 +98,6 @@ const router = createBrowserRouter([
                 path: ":standard/:address",
                 element: (
                   <div>
-                    eth/token-txn-details/:standard/:address path
                     <TokenTransactionDetails></TokenTransactionDetails>
                   </div>
                 ),
@@ -121,7 +118,6 @@ const router = createBrowserRouter([
                 path: ":standard/:address",
                 element: (
                   <div>
-                    eth/token-detail/:standard/:address path
                     <TokenDetails></TokenDetails>
                   </div>
                 ),
@@ -133,7 +129,6 @@ const router = createBrowserRouter([
             path: "txn-details",
             element: (
               <div>
-                txn-detail
                 <Outlet></Outlet>
               </div>
             ),
@@ -142,7 +137,6 @@ const router = createBrowserRouter([
                 path: ":id",
                 element: (
                   <div>
-                    eth/txn-detail/:id path
                     <TransactionDetails></TransactionDetails>
                   </div>
                 ),
@@ -154,7 +148,7 @@ const router = createBrowserRouter([
             path: "erc20",
             element: (
               <div>
-                eth/erc20 path <Outlet></Outlet>
+                <Outlet></Outlet>
               </div>
             ),
             children: [
@@ -162,7 +156,6 @@ const router = createBrowserRouter([
                 path: ":account",
                 element: (
                   <div>
-                    eth/erc20/:account path
                     <ERC20></ERC20>
                   </div>
                 ),
@@ -171,7 +164,6 @@ const router = createBrowserRouter([
                 path: "trend/:account/:address",
                 element: (
                   <div>
-                    trend/:account/:address path
                     <SingleTokenHistory></SingleTokenHistory>
                   </div>
                 ),
@@ -182,7 +174,7 @@ const router = createBrowserRouter([
             path: "erc721",
             element: (
               <div>
-                eth/erc721 path <Outlet></Outlet>
+                <Outlet></Outlet>
               </div>
             ),
             children: [
@@ -190,7 +182,6 @@ const router = createBrowserRouter([
                 path: ":account",
                 element: (
                   <div>
-                    eth/erc721/:account path
                     <ERC721></ERC721>
                   </div>
                 ),
@@ -208,7 +199,6 @@ const router = createBrowserRouter([
             path: "dashboard",
             element: (
               <div>
-                <p>/dashboard</p>
                 <DashFabric></DashFabric>
               </div>
             ),
@@ -217,7 +207,6 @@ const router = createBrowserRouter([
             path: "transactions",
             element: (
               <div>
-                transactions
                 <TransactionsFabric></TransactionsFabric>
               </div>
             ),
@@ -226,7 +215,6 @@ const router = createBrowserRouter([
             path: "blocks",
             element: (
               <div>
-                blocks
                 <BlocksFabric></BlocksFabric>
               </div>
             ),
@@ -243,7 +231,7 @@ const router = createBrowserRouter([
                 path: ":id",
                 element: (
                   <div>
-                    txn-details/:id
+             
                     <FabricTransaction></FabricTransaction>
                   </div>
                 ),

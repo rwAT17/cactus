@@ -7,15 +7,18 @@ import Pagination from "../Pagination/Pagination";
 import EmptyTablePlaceholder from "../UI/CustomTable/EmptyTablePlaceholder/EmptyTablePlaceholder";
 import styles from "./CardWrapper.module.css";
 
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 const pageSize: number = 6;
 
 function CardWrapper(props) {
+  const location = useLocation();
+  const path = location.pathname.split("/");
+
   const navigate = useNavigate();
   const [searchKey, setSearchKey] = useState("");
-  const [filteredData, setFilteredData] = useState<any[]>([]);
+  let filteredData = props.data;
   const [paginatedData, setPaginatedData] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -39,19 +42,19 @@ function CardWrapper(props) {
   const filterData = () => {
     const { filters, data } = props;
     if (searchKey.length === 0) {
-      setFilteredData(data);
+      filteredData = data;
       return;
     }
-    let newData = data.filter((row) => {
+    const newData = data.filter((row) => {
       let isMatch: boolean = false;
-      filters?.forEach((property) => {
+      filters?.forEach((property: string | number) => {
         if (row[property]?.toString().toLowerCase().includes(searchKey)) {
           isMatch = true;
         }
       });
       return isMatch;
     });
-    setFilteredData(newData);
+    filteredData = newData;
   };
 
   const handleSearch = () => {
@@ -62,10 +65,6 @@ function CardWrapper(props) {
   };
 
   useEffect(() => {
-    setFilteredData(props.data);
-  });
-
-  useEffect(() => {
     const screenResized = () =>
       setViewport(window.innerWidth <= 1699 ? "small" : "wide");
     screenResized();
@@ -73,7 +72,7 @@ function CardWrapper(props) {
     return () => {
       window.removeEventListener("resize", screenResized, true);
     };
-  });
+  }, [paginatedData, viewport]);
 
   useEffect(() => {
     if (filteredData.length <= pageSize) {
@@ -82,12 +81,13 @@ function CardWrapper(props) {
       const firstEl = currentPage * pageSize - pageSize;
       setPaginatedData(filteredData.slice(firstEl, firstEl + pageSize));
     }
-  });
+  }, [currentPage, filteredData, filteredData.length, paginatedData]);
 
   useEffect(() => {
     const pageNum = Math.ceil(filteredData.length / pageSize);
     setTotalPages(pageNum);
-  });
+  }, [totalPages, filteredData.length]);
+  console.warn("RENDER");
 
   return (
     <section
@@ -102,7 +102,7 @@ function CardWrapper(props) {
         {props.trimmed && viewport === "small" && (
           <Button
             type={"primary"}
-            onClick={() => navigate(`/eth/${props.title.toLowerCase()}`)}
+            onClick={() => navigate(`/${path[1]}/${props.title.toLowerCase()}`)}
           >
             View all
           </Button>
@@ -129,7 +129,7 @@ function CardWrapper(props) {
         {props.trimmed && viewport === "wide" && (
           <Button
             type={"primary"}
-            onClick={() => navigate(`/eth/${props.title.toLowerCase()}`)}
+            onClick={() => navigate(`/${path[1]}/${props.title.toLowerCase()}`)}
           >
             View all
           </Button>
