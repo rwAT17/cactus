@@ -23,7 +23,7 @@ const Pages = () => {
   return (
     <Routes>
       <Route path="/" component={Home} />
-            <Route path="/eth/" component={Dashboard} />
+      <Route path="/eth/" component={Dashboard} />
       <Route path="/eth/erc20">
         <Route path="/:account" component={ERC20} />
         <Route path="/trend/:account/:address" component={SingleTokenHistory} />
@@ -48,9 +48,9 @@ const Pages = () => {
       <Route path="/eth/txn-details">
         <Route path="/:id" component={TransactionDetails} />
       </Route>
-      
+
       <Route path="/fabric/" component={DashFabric} />
-      
+
       <Route path="/fabric/transactions" component={TransactionsFabric} />
       <Route path="/fabric/blocks" component={BlocksFabric} />
       <Route path="/fabric/txn-details">
