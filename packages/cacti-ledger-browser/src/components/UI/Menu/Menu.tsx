@@ -16,23 +16,25 @@ const Menu = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeLedger, setActiveLedger] = createSignal("");
-  
+
   const handleSelect = (selectedValue: string) => {
     setActiveLedger(selectedValue);
-    navigate(`/${activeLedger()}`)
+    console.log(activeLedger);
+    navigate(`/${activeLedger}`);
+    console.log(location);
   };
 
-  createEffect(()=>{
-    if(activeLedger().length > 0) return
-    const currentPath = location.pathname
-    const ledgers = ['eth', 'fabric']
+  createEffect(() => {
+    if (activeLedger().length > 0) return;
+    const currentPath = location.pathname;
+    const ledgers = ["eth", "fabric"];
 
-     ledgers.forEach(ledger => {
-      if(currentPath.includes(ledger)){
-        setActiveLedger(ledger)
+    ledgers.forEach((ledger) => {
+      if (currentPath.includes(ledger)) {
+        setActiveLedger(ledger);
       }
-    })
-  })
+    });
+  });
 
   return (
     <div class={styles["nav-bar"]}>

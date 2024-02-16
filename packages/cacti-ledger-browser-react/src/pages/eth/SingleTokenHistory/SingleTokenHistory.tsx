@@ -1,21 +1,18 @@
-import { createSignal, createEffect, Show } from "solid-js";
 import { supabase } from "../../../supabase-client";
 import CardWrapper from "../../../components/CardWrapper/CardWrapper";
 import LineChart from "../../../components/Chart/LineChart";
 import TokenHeader from "../../../components/TokenHeader/TokenHeader";
-import { useNavigate, useParams } from "@solidjs/router";
 import { TokenHistoryItem20 } from "../../../schema/supabase-types";
 import { balanceDate } from "../../../schema/supabase-types";
-// @ts-expect-error
 import styles from "./SingleTokenHistory.module.css";
 import EmptyTablePlaceholder from "../../../components/UI/CustomTable/EmptyTablePlaceholder/EmptyTablePlaceholder";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 const SingleTokenHistory = () => {
   type ObjectKey = keyof typeof styles;
-  const [transactions, setTransactions] = createSignal<TokenHistoryItem20[]>(
-    [],
-  );
-  const [balanceHistory, setBalanceHistory] = createSignal<balanceDate[]>([]);
+  const [transactions, setTransactions] = useState<TokenHistoryItem20[]>([]);
+  const [balanceHistory, setBalanceHistory] = useState<balanceDate[]>([]);
   const navigate = useNavigate();
   const params = useParams();
 
@@ -84,22 +81,43 @@ const SingleTokenHistory = () => {
     }
   };
 
-  createEffect(async () => {
-    await fetchTransactions();
+  useEffect(() => {
+    fetchTransactions();
   }, []);
 
   return (
-    <div class={styles["token-history" as ObjectKey]}>
+    <div className={styles["token-history" as ObjectKey]}>
       <TokenHeader accountNum={params.account} token_address={params.address} />
-      <div class={styles["transactions" as ObjectKey]}>
-        <Show
-          when={transactions().length > 0}
+      <div className={styles["transactions" as ObjectKey]}>
+        {transactions.length > 0 ? (
+          <>
+            <LineChart chartData={balanceHistory} />
+            <CardWrapper
+              columns={tokenTableProps}
+              data={transactions}
+              title={"Token history"}
+              display={"all"}
+              filters={[
+                "transaction_hash",
+                "sender",
+                "recipient",
+                "token_address",
+              ]}
+              trimmed={false}
+            ></CardWrapper>
+          </>
+        ) : (
+          <EmptyTablePlaceholder />
+        )}
+
+        {/* <Show
+          when={transactions.length > 0}
           fallback={<EmptyTablePlaceholder />}
         >
           <LineChart chartData={balanceHistory} />
           <CardWrapper
             columns={tokenTableProps}
-            data={transactions()}
+            data={transactions}
             title={"Token history"}
             display={"all"}
             filters={[
@@ -110,7 +128,7 @@ const SingleTokenHistory = () => {
             ]}
             trimmed={false}
           ></CardWrapper>
-        </Show>
+        </Show> */}
       </div>
     </div>
   );
